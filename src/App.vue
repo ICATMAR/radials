@@ -1,8 +1,5 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
+  <TopIcons></TopIcons>
   <div>
     <a href="https://vite.dev" target="_blank">
       <img src="/vite.svg" class="logo" alt="Vite logo" />
@@ -13,6 +10,14 @@ import HelloWorld from './components/HelloWorld.vue'
   </div>
   <HelloWorld msg="About" />
 </template>
+
+
+<script setup>
+import HelloWorld from './components/HelloWorld.vue'
+import TopIcons from './components/TopIcons.vue';
+</script>
+
+
 
 <style scoped>
 .logo {
