@@ -3,7 +3,7 @@
   <div class="dropdown">
     <div class="dropbtnBackground">
       <!-- <button @click="dropdownClick" class="dropbtn" :style="{'background-image': 'url(./img/'+ $i18n.locale + '-200.png)'}"></button> -->
-      <button @click="dropdownClick" class="dropbtn">{{$i18n.locale}}</button>
+      <button @click="dropdownClick" class="dropbtn">{{ $i18n.locale }}</button>
 
     </div>
     <div id="myDropdown" class="dropdown-content">
@@ -20,10 +20,10 @@
 <script>
 export default {
   name: "app-manager",
-  created(){
-    
+  created() {
+
     // Close the dropdown menu if the user clicks outside of it
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       if (!event.target.matches('.dropbtn')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
         var i;
@@ -36,7 +36,7 @@ export default {
       }
     }
   },
-  mounted () {
+  mounted() {
     // Set language
     this.$i18n.locale = window.GUIManager.currentLanguage;
     // EVENTS
@@ -44,18 +44,18 @@ export default {
       this.$i18n.locale = lang;
     })
   },
-  data () {
+  data() {
     return {
-      
+
     }
   },
   methods: {
     // INTERNAL EVENTS
-    dropdownClick: function(){
+    dropdownClick: function () {
       document.getElementById("myDropdown").classList.toggle("show");
     },
     // Change language
-    changeLanguage: function(el){
+    changeLanguage: function (el) {
       let lang = el.target.getAttribute('value');
       this.$i18n.locale = lang;
       window.eventBus.emit('LanguageSelector_LanguageChanged', lang);
@@ -66,7 +66,7 @@ export default {
 
   },
   computed: {
-  
+
   }
 }
 
@@ -80,7 +80,7 @@ export default {
   box-shadow: 0px 0px 4px 0px black;
   border-radius: 50%;
   color: white;
-  width:36px;
+  width: 36px;
   height: 36px;
   text-decoration: none;
   padding: 4px;
@@ -88,7 +88,7 @@ export default {
   border: none;
   cursor: pointer;
 
-  
+
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -99,14 +99,15 @@ export default {
 
 }
 
-.dropbtnBackground{
+.dropbtnBackground {
   /* background-color: #ffffff74; */
   border-radius: 4px;
   padding: 3px;
 }
 
 /* Dropdown button on hover & focus */
-.dropbtn:hover, .dropbtn:focus {
+.dropbtn:hover,
+.dropbtn:focus {
   background-color: var(--blue);
 }
 
@@ -123,7 +124,7 @@ export default {
   position: absolute;
   background-color: var(--darkBlue);
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 }
 
 /* Links inside the dropdown */
@@ -142,7 +143,7 @@ export default {
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {
-  display:block;
+  display: block;
   right: 3%;
 }
 
@@ -160,17 +161,16 @@ export default {
 
 .es:before {
   content: '';
-  background-image: url(./img/es-200.png);
+  background-image: url(/src/assets/img/es-200.png);
 }
 
 .en:before {
   content: '';
-  background-image: url(./img/en-200.png);
+  background-image: url(/src/assets/img/en-200.png);
 }
+
 .cat:before {
   content: '';
-  background-image: url(./img/ca-200.png);
+  background-image: url(/src/assets/img/ca-200.png);
 }
-
-
 </style>

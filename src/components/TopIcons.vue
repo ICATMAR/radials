@@ -1,7 +1,7 @@
 <template>
   <!-- TOP-LEFT - ICATMAR ICON -->
   <a href="https://icatmar.cat/">
-    <img class="logo logo-big clickable icatmar-logo" src="/src/assets/logos/icatmar-mini-logo.svg">
+    <img class="logo logo-big clickable icatmar-logo" src="/src/assets/img/logos/icatmar-mini-logo.svg">
   </a>
 
 
@@ -85,12 +85,12 @@ import LanguageSelector from '/src/components/TopRightSection/LanguageSelector.v
   z-index: 10;
 }
 
-.container-section{
+.container-section {
   display: flex;
   flex-direction: row-reverse;
 }
 
-.container-section > * {
+.container-section>* {
   padding-left: 3px;
   padding-right: 3px;
 }
@@ -119,7 +119,7 @@ import LanguageSelector from '/src/components/TopRightSection/LanguageSelector.v
   background: green;
 }
 
-.activeSyncButtonIcon{
+.activeSyncButtonIcon {
   padding: 0px;
   text-align: center;
 }
