@@ -31,10 +31,10 @@
 
 
       <!-- Active sync -->
-      <div class="hiddenInMobile activeSyncButton clickable" :class="[isActiveSyncOn ? 'activeSyncButtonOn' : '']"
+      <button class="hiddenInMobile activeSyncButton clickable" :class="[isActiveSyncOn ? 'activeSyncButtonOn' : '']"
         @click="changeActiveSync" title="Latest data is updated automatically when active"><span>Active Sync</span>
-      </div>
-      <div class="visibleInMobile activeSyncButton activeSyncButtonIcon icon-str clickable"
+      </button>
+      <div class="visibleInMobile icon-str activeSyncButton activeSyncButtonIcon clickable"
         :class="[isActiveSyncOn ? 'activeSyncButtonOn' : '']" @click="changeActiveSync"
         title="Latest data is updated automatically when active">
         <span class="fa">&#xf2f1;</span>
@@ -48,9 +48,27 @@
 
 
 <script setup>
+// https://vuejs.org/api/sfc-script-setup.html#script-setup
 import Information from '/src/components/TopRightSection/Information.vue';
 import CookieBanner from '/src/components/TopRightSection/CookieBanner.vue';
 import LanguageSelector from '/src/components/TopRightSection/LanguageSelector.vue';
+
+// Initialize variables
+let isActiveSyncOn = false;
+
+// Methods
+const changeActiveSync = function (e) {
+  isActiveSyncOn = !isActiveSyncOn;
+  // window.GUIManager.activeSync = isActiveSyncOn;
+  // // If it is activated, force to be on the latest date
+  // if (isActiveSyncOn) {
+  //   // HACK: do not send tmst so that DataManager knows that it is sent from TopRightSection
+  //   window.DataManager.loadOnInteraction().then(hfRadar => {
+  //     window.eventBus.emit('TopRightCanvas_ActiveSyncClickedAndOn', window.DataManager.latestDataTmst);
+  //   });
+  // }
+}
+
 </script>
 
 
@@ -90,20 +108,16 @@ import LanguageSelector from '/src/components/TopRightSection/LanguageSelector.v
   flex-direction: row-reverse;
 }
 
-.container-section>* {
-  padding-left: 3px;
-  padding-right: 3px;
-}
 
 
 .github-logo {
   background: white;
   border-radius: 50%;
   border-color: black !important;
-  border-width: thick;
+  border-width: 3px;
+  width: 22px;
+  height: 22px;
   border: double;
-  width: 28px;
-  height: 28px;
 }
 
 .activeSyncButton {
@@ -113,6 +127,7 @@ import LanguageSelector from '/src/components/TopRightSection/LanguageSelector.v
   margin-right: 3px;
   padding-left: 10px;
   padding-right: 10px;
+  height: 28px;
 }
 
 .activeSyncButtonOn {

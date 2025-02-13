@@ -1,11 +1,9 @@
 <template>
 
-  <div class="dropdown">
-    <div class="dropbtnBackground">
-      <!-- <button @click="dropdownClick" class="dropbtn" :style="{'background-image': 'url(./img/'+ $i18n.locale + '-200.png)'}"></button> -->
-      <button @click="dropdownClick" class="dropbtn">{{ $i18n.locale }}</button>
+  <!-- <button @click="dropdownClick" class="dropbtn" :style="{'background-image': 'url(./img/'+ $i18n.locale + '-200.png)'}"></button> -->
+  <button @click="dropdownClick" id="lang-button-icon" class="icon-str clickable">{{ $i18n.locale }}</button>
 
-    </div>
+  <div class="dropdown">
     <div id="myDropdown" class="dropdown-content">
       <div class="lgItem cat" value='ca' @click='changeLanguage' href="#">Català</div>
       <div class="lgItem es" value='es' @click='changeLanguage' href="#">Español</div>
@@ -24,7 +22,7 @@ export default {
 
     // Close the dropdown menu if the user clicks outside of it
     window.onclick = function (event) {
-      if (!event.target.matches('.dropbtn')) {
+      if (!event.target.matches('#lang-button-icon')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
         var i;
         for (i = 0; i < dropdowns.length; i++) {
@@ -80,8 +78,6 @@ export default {
   box-shadow: 0px 0px 4px 0px black;
   border-radius: 50%;
   color: white;
-  width: 36px;
-  height: 36px;
   text-decoration: none;
   padding: 4px;
   font-size: 16px;
@@ -99,11 +95,7 @@ export default {
 
 }
 
-.dropbtnBackground {
-  /* background-color: #ffffff74; */
-  border-radius: 4px;
-  padding: 3px;
-}
+
 
 /* Dropdown button on hover & focus */
 .dropbtn:hover,
@@ -125,6 +117,7 @@ export default {
   background-color: var(--darkBlue);
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
 }
 
 /* Links inside the dropdown */
@@ -133,6 +126,7 @@ export default {
   padding: 4px 4px;
   text-decoration: none;
   display: block;
+  border-radius: 10px;
 }
 
 /* Change color of dropdown links on hover */
@@ -157,6 +151,7 @@ export default {
   margin-left: 10px;
   background-size: contain;
   background-repeat: no-repeat;
+  user-select: none;
 }
 
 .es:before {
