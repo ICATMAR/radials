@@ -88,6 +88,8 @@ const changeActiveSync = function (e) {
 
 .icatmar-logo {
   left: 50px;
+  box-shadow: 0 0 4px black;
+  border-radius: 50%;
 }
 
 
