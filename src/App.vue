@@ -8,17 +8,19 @@
     <div class="graphs-radars-container">
       <div class="graph-radar-container" v-for="rr in radars">
         <div>{{ rr }}</div>
-        <div>Some graph</div>
-        <div>Explore in interactive map</div>
+        <div class="graph-radar-map-container">
+          <div class="graph-container">Some graph</div>
+          <div class="map-container">Explore in interactive map</div>
+        </div>
       </div>
     </div>
 
     <!-- Bottom images of radars -->
     <div class="imgs-radars-container">
-      <div v-for="rr in radars" class="img-radar-container">
-        <div class="img-radar-title ">{{ rr }}</div>
-        <div class="filler-img"></div>
-      </div>
+      <!-- <div v-for="rr in radars" class="img-radar-container">
+          <div class="img-radar-title ">{{ rr }}</div>
+          <div class="filler-img"></div>
+        </div> -->
     </div>
   </div>
 </template>
@@ -63,6 +65,7 @@ const radars = ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'];
 
 .graphs-radars-container {
   overflow-y: auto;
+  height: -webkit-fill-available;
 }
 
 .graph-radar-container {
@@ -72,10 +75,32 @@ const radars = ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'];
   padding-bottom: 20px;
 }
 
+.graph-radar-map-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  width: calc(100% - 50px);
+  justify-content: center;
+  max-width: 1200px;
+}
+
+.graph-container {
+  width: 80%;
+  height: 200px;
+  background-color: var(--lightBlue);
+}
+
+.map-container {
+  width: 200px;
+  height: 200px;
+  background-color: var(--red);
+}
+
+
 
 .imgs-radars-container {
-  background-color: blue;
-  height: 180px;
+  background-color: var(--darkBlue);
+  height: 50px;
   bottom: 0px;
   overflow-x: auto;
   display: flex;
@@ -83,7 +108,7 @@ const radars = ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'];
   flex-wrap: nowrap;
 }
 
-.img-radar-container {
+/* .img-radar-container {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -100,11 +125,20 @@ const radars = ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'];
   width: 150px;
   height: 150px;
   background-color: aqua;
-}
+} */
+
 
 @media screen and (max-width: 770px) {
   .title {
     font-size: 20px;
+  }
+
+  .graph-radar-map-container {
+    width: 100%;
+  }
+
+  .graph-container {
+    width: 95%;
   }
 }
 </style>
