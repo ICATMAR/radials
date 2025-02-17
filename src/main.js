@@ -2,6 +2,9 @@ import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import './globalStyle.css'
 import App from './App.vue'
+import HighchartsVue from 'highcharts-vue';
+
+
 
 
 import ca from './lang/ca.js';
@@ -49,4 +52,5 @@ window.GUIManager = new GUIManager();
 
 const app = createApp(App)
 app.use(i18n);
+app.use(HighchartsVue);
 app.mount('#app');
