@@ -9,7 +9,9 @@
       <div class="graph-radar-container" v-for="rr in radars">
         <div>{{ rr }}</div>
         <div class="graph-radar-map-container">
-          <div class="graph-container">Some graph</div>
+          <div class="graph-container">
+            <Chart />
+          </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
       </div>
@@ -28,6 +30,7 @@
 
 <script setup>
 import TopIcons from './components/TopIcons.vue';
+import Chart from './components/RadialChart.vue';
 
 const radars = ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'];
 </script>
