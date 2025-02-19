@@ -82,13 +82,13 @@ class FileManager {
 
   parseText = function (rawText) {
     // Get FileType
-    let fileType = getParamFromTable(rawText, 'FileType');
+    let fileType = this.getParamFromTable(rawText, 'FileType');
 
     // Radials and Currents map
     if (fileType.includes('RadialMap') || fileType.includes('CurrentMap'))
-      return parseRadialCurrentMapText(rawText);
+      return this.parseRadialCurrentMapText(rawText);
     else if (fileType.includes('WaveHistory'))
-      return parseWaveHistoryText(rawText);
+      return this.parseWaveHistoryText(rawText);
   }
 
   // Parse text
@@ -348,7 +348,7 @@ class FileManager {
             if (res[0] == '<')
               throw new Error('File not found: ' + urls[i]);
             this.loadedFilesLog.push({ "url": urls[i], "contentTxt": res });
-            return parseText(res);
+            return this.parseText(res);
           })
       );
     }
@@ -420,7 +420,7 @@ class FileManager {
             if (res[0] == '<')
               throw new Error('File not found: ' + urls[i]);
             this.loadedFilesLog.push({ "url": urls[i], "contentTxt": res });
-            return parseText(res);
+            return this.parseText(res);
           })
       );
     }
@@ -433,8 +433,9 @@ class FileManager {
   // Get radar files
   loadAntennaFiles = function (antennaID, timestamp) {
 
-    let baseURL = '/data/observational/hf_radar/currents/'
-    let wavesBaseURL = '/data/observational/hf_radar/waves/'
+
+    let baseURL = 'http://127.0.0.1:5500/data/observational/hf_radar/currents/'
+    let wavesBaseURL = 'http://127.0.0.1:5500/data/observational/hf_radar/waves/'
 
     let date = timestamp == undefined ? new Date() : new Date(timestamp);
     let dateISO = date.toISOString();
@@ -449,7 +450,7 @@ class FileManager {
     let urls = [];
 
     // Radials
-    urls.push(baseURL + 'L2/' + antennaID + '/' + year + '/' + month + '/RDLm_CREU_' + year + '_' + month + '_' + day + '_' + hour + '00_l2b.ruv');
+    urls.push(baseURL + 'L2/' + antennaID + '/' + year + '/' + month + '/RDLm_' + antennaID + '_' + year + '_' + month + '_' + day + '_' + hour + '00_l2b.ruv');
     // Waves
     urls.push(wavesBaseURL + antennaID + '/WVLM_' + antennaID + '_' + year + '_' + month + '_01_0000.wls');
 
@@ -472,7 +473,7 @@ class FileManager {
             if (res[0] == '<')
               throw new Error('File not found: ' + urls[i]);
             this.loadedFilesLog.push({ "url": urls[i], "contentTxt": res });
-            return parseText(res);
+            return this.parseText(res);
           })
           .catch(e => { throw e })
       );
