@@ -7,10 +7,10 @@
     <!-- Temporal status radials -->
     <div class="graphs-radars-container">
       <div class="graph-radar-container" v-for="rr in radars">
-        <div>{{ rr }}</div>
+        <!-- <div>{{ rr }}</div> -->
         <div class="graph-radar-map-container">
           <div class="graph-container">
-            <Chart />
+            <Chart :antennaID=rr />
           </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
