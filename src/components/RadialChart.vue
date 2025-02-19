@@ -11,7 +11,7 @@ import HighchartsVue from 'highcharts-vue';
 
 export default {
   mounted() {
-
+    this.getRadarData();
   },
   data() {
     return {
@@ -171,8 +171,29 @@ export default {
   },
   methods: {
 
-    getRadarData: ()=> {
-      // Call Datamanger tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
+    getRadarData: () => {
+      let timestamps = [];
+      // Last 24 h?
+      let date = new Date();
+      let dateISO = date.toISOString();
+      dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
+      timestamps.push(dateISO);
+      // Back in time
+      date = new Date(dateISO);
+      for (let i = 1; i < 24; i++){
+        date.setUTCHours(date.getUTCHours() - 1); // One hour less
+        dateISO = date.toISOString();
+        dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
+        timestamps.push(dateISO);
+      }
+
+
+      // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
+      window.DataManager.getAntennaFiles('CREU', timestamps, (tmstsLoaded, totalTmstsToLoad) => {
+        console.log('Loaded timestamps: ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
+      }).then(res => {
+        console.log(res);
+      }).catch(e => {debugger;});
     }
   },
 };
@@ -182,5 +203,6 @@ export default {
 #chart {
   height: 200px;
 }
+
 /* Add any styles here */
 </style>

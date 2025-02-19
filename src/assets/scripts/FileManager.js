@@ -464,7 +464,6 @@ class FileManager {
       if (!fileWasRequested) {
         this.requestedFiles.push(urls[i]);
       }
-
       // Request file
       promises.push(
         fetch(urls[i])
@@ -475,9 +474,11 @@ class FileManager {
             this.loadedFilesLog.push({ "url": urls[i], "contentTxt": res });
             return parseText(res);
           })
+          .catch(e => { throw e })
       );
     }
 
+    console.log(promises.length);
     return Promise.allSettled(promises)
   }
 
