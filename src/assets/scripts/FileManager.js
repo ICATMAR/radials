@@ -41,41 +41,13 @@ class FileManager {
     // './Assets/BaseLayer/OSM.png'
   ];
 
-  requestedFiles = [];
+  requestedFiles = {};
   loadedFilesLog = [];
 
 
 
   constructor() {
-    // WEB WORKER
-    // Capture web worker messages
-    if (window.DataWorker) {
-      window.DataWorker.onmessage = (e) => {
-        // Interaction with main thread and web worker can be slow, avoid doing postmessage repeatedly
-        let result = e.data;
-        // Loaded data from worker
-        if (result[0] == 'loadDataFromRepository') {
-          this.petitionsSolved++;
-        } else if (result[0] == 'loadStaticFilesRepository') {
-          let data = result[1];
-          for (let i = 0; i < data.length; i++) {
-            window.DataManager.addHFRadarData(data[i]);
-          }
-          // First-load and load due to user interaction
-          window.eventBus.emit('HFRadarDataLoaded');
-        }
-        // Keep track of requested files
-        else if (result[0] == 'requestedFiles') {
-          let reqFiles = result[1];
-          this.requestedFiles.push(...reqFiles);
-        }
-        // Keep track of loaded files
-        else if (result[0] == 'loadedFilesLog') {
-          let loadedLog = result[1];
-          this.loadedFilesLog.push(...loadedLog);
-        }
-      }
-    }
+
   }
 
 
@@ -265,7 +237,7 @@ class FileManager {
 
 
   loadDataFromRepository = function (timestamp, fileTypes) {
-
+    return; // this.requestedFiles needs fixing
     //let baseURL = 'https://icatmar.github.io/HFRadarData/'
     let baseURL = '/data/observational/hf_radar/currents/'
     let wavesBaseURL = '/data/observational/hf_radar/waves/'
@@ -329,7 +301,7 @@ class FileManager {
 
     for (let i = 0; i < urls.length; i++) {
       // Check if this file was already requested, only if activeSync is off
-      let fileWasRequested = this.requestedFiles.indexOf(urls[i]) != -1;
+      let fileWasRequested = urls[i] in this.requestedFiles;
 
       // Skip file
       if (fileWasRequested && !window.GUIManager.activeSync) {
@@ -366,6 +338,7 @@ class FileManager {
 
   // Load demo data in case the pipeline is broken
   loadDemoData = function () {
+    return; // this.requestedFiles needs fixing
     let baseURL = window.location.href.replace('index.html', '');
     baseURL = baseURL.split('#')[0];
     baseURL += 'data/demoData';
@@ -456,30 +429,34 @@ class FileManager {
 
     for (let i = 0; i < urls.length; i++) {
       // Check if this file was already requested, only if activeSync is off
-      let fileWasRequested = this.requestedFiles.indexOf(urls[i]) != -1;
-      // Skip file
+      let fileWasRequested = urls[i] in this.requestedFiles;
+      // Add file to return promise and continue
       if (fileWasRequested && !window.GUIManager.activeSync) {
+        // Return promise
+        promises.push(this.requestedFiles[urls[i]]);
         continue;
       }
-      // Keep track of requested files
-      if (!fileWasRequested) {
-        this.requestedFiles.push(urls[i]);
-      }
+      // Create promise
+      let filePromise = fetch(urls[i])
+      .then(r => r.text()) // https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch
+      .then(res => {
+        if (res[0] == '<')
+          throw new Error('File not found: ' + urls[i]);
+        // Store resolved promise
+        this.requestedFiles[urls[i]] = new Promise(resolve => resolve(this.parseText(res)));
+        // Store original text
+        this.loadedFilesLog.push({ "url": urls[i], "contentTxt": res });
+        // Return parsed text
+        return this.parseText(res);
+      })
+      .catch(e => { throw e });
+
       // Request file
-      promises.push(
-        fetch(urls[i])
-          .then(r => r.text()) // https://stackoverflow.com/questions/32545632/how-can-i-download-a-file-using-window-fetch
-          .then(res => {
-            if (res[0] == '<')
-              throw new Error('File not found: ' + urls[i]);
-            this.loadedFilesLog.push({ "url": urls[i], "contentTxt": res });
-            return this.parseText(res);
-          })
-          .catch(e => { throw e })
-      );
+      promises.push(filePromise);
+      // Keep track of requested files
+      this.requestedFiles[urls[i]] = filePromise;
     }
 
-    console.log(promises.length);
     return Promise.allSettled(promises)
   }
 

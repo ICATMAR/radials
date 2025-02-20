@@ -545,20 +545,27 @@ class DataManager {
         tmstsLoaded++;
         progressCallback(tmstsLoaded, totalTmstsToLoad);
         if (res.length == 0) {
-
+          debugger;
+          return { status: "empty", timestamp: timestamps[i] };
         } else {
+          // Iterate results (file loads)
+          let validResults = [];
           res.forEach(rr => {
             if (rr.status == 'rejected')
-              throw rr.reason;
+              console.error(rr.reason);
             else {
-              debugger;
-              console.log(res);
-              //this.addHFRadarData(res)
+              validResults.push(rr.value);
+              // File data is stored in DataManager. In principle there is no need to return values
+              this.addHFRadarData(rr.value)
             }
           });
-
+          // Return loaded files content
+          if (validResults.length == 0)
+            throw res[0].reason;
+          else
+            return validResults;
         }
-        
+
       }).catch(e => { throw e }));
     }
 
