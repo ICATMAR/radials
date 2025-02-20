@@ -1,10 +1,20 @@
 <template>
+  <!-- Loading bar -->
+  <Transition>
+    <div id="progress-container" v-show="progress != 100">
+      <span id="progress-text">{{ progress }} %</span>
+      <div id="progress-bar" :style="{ width: progress + '%' }"></div>
+    </div>
+  </Transition>
+  <!-- High charts -->
   <highcharts id="chart" :options="chartOptions"></highcharts>
+
 </template>
 
 <script>
 import Highcharts from 'highcharts';
 import HighchartsVue from 'highcharts-vue';
+import { Transition } from 'vue';
 // https://www.highcharts.com/demo/highcharts/combo-multi-axes
 
 
@@ -21,6 +31,9 @@ export default {
   },
   data() {
     return {
+      // Progress bar
+      progress: 0,
+      // Highcharts
       chartOptions: {
         chart: {
           zooming: {
@@ -86,7 +99,8 @@ export default {
           opposite: true
         }],
         tooltip: {
-          shared: true
+          shared: true,
+          xDateFormat: '%Y-%m-%d %Hh',
         },
         legend: {
           layout: 'vertical',
@@ -108,7 +122,7 @@ export default {
           tooltip: {
             valueSuffix: ' points'
           }
-        }, 
+        },
         // Secondary
         {
           name: 'Flagged points',
@@ -123,7 +137,7 @@ export default {
             valueSuffix: ' points'
           }
 
-        }, 
+        },
         // Tertiary
         {
           name: 'Max. velocity',
@@ -191,7 +205,8 @@ export default {
 
       // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
       window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
-        console.log('Loaded timestamps of ' + this.antennaID + ': ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
+        //console.log('Loaded timestamps of ' + this.antennaID + ': ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
+        this.progress = parseInt((tmstsLoaded / totalTmstsToLoad) * 100);
       }).then(res => {
         // Generate chart data
         let dataSeries1 = [];
@@ -217,7 +232,7 @@ export default {
           if (points != undefined) {
             dataValue = points.length;
             //dV2 = Math.max(...points.map(p => p["SNR (dB)"]));
-            dV2 = points.filter(p => 
+            dV2 = points.filter(p =>
               p["Q201 (flag)"] != 1 ||
               p["Q202 (flag)"] != 1 ||
               p["Q203 (flag)"] != 1 ||
@@ -249,6 +264,29 @@ export default {
 <style scoped>
 #chart {
   height: 200px;
+}
+
+#progress-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  background-color: var(--darkBlue);
+  border-radius: 10px;
+}
+
+#progress-bar {
+  width: 100%;
+  height: 100%;
+  background: var(--lightBlue);
+  position: absolute;
+  border-radius: 5px;
+  opacity: 0.5;
+}
+
+#progress-text {
+  z-index: 2;
+  color: white;
+  text-shadow: 0 0 4px black;
 }
 
 /* Add any styles here */
