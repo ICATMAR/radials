@@ -43,13 +43,13 @@ export default {
           title: {
             text: 'Num. points',
             style: {
-              color: Highcharts.getOptions().colors[2]
+              color: Highcharts.getOptions().colors[0]
             }
           },
           labels: {
             format: '{value} points',
             style: {
-              color: Highcharts.getOptions().colors[2]
+              color: Highcharts.getOptions().colors[0]
             }
           },
           opposite: true
@@ -57,28 +57,28 @@ export default {
         }, { // Secondary yAxis
           gridLineWidth: 0,
           title: {
-            text: 'SNR (dB)',
+            text: 'Flagged points',
             style: {
-              color: Highcharts.getOptions().colors[0]
+              color: Highcharts.getOptions().colors[2]
             }
           },
           labels: {
-            format: '{value} dB SNR',
+            format: '{value} flagged points',
             style: {
-              color: Highcharts.getOptions().colors[0]
+              color: Highcharts.getOptions().colors[2]
             }
           }
 
         }, { // Tertiary yAxis
           gridLineWidth: 0,
           title: {
-            text: 'Spatial Count',
+            text: 'Max. velocity',
             style: {
               color: Highcharts.getOptions().colors[1]
             }
           },
           labels: {
-            format: '{value} points',
+            format: '{value} cm/s',
             style: {
               color: Highcharts.getOptions().colors[1]
             }
@@ -100,6 +100,7 @@ export default {
             'rgba(255,255,255,0.25)'
         },
         series: [{
+          // Primary
           name: 'Num. points',
           type: 'column',
           yAxis: 0,
@@ -107,8 +108,10 @@ export default {
           tooltip: {
             valueSuffix: ' points'
           }
-        }, {
-          name: 'Range Cells',
+        }, 
+        // Secondary
+        {
+          name: 'Flagged points',
           type: 'spline',
           yAxis: 1,
           data: [],
@@ -117,16 +120,18 @@ export default {
           },
           dashStyle: 'shortdot',
           tooltip: {
-            valueSuffix: ' dB'
+            valueSuffix: ' points'
           }
 
-        }, {
-          name: 'Spatial Count',
+        }, 
+        // Tertiary
+        {
+          name: 'Max. velocity',
           type: 'spline',
           yAxis: 2,
           data: [],
           tooltip: {
-            valueSuffix: ' points'
+            valueSuffix: ' cm/s'
           }
         }],
         responsive: {
@@ -211,8 +216,16 @@ export default {
           let dV3 = 0;
           if (points != undefined) {
             dataValue = points.length;
-            dV2 = Math.max(...points.map(p => p["SNR (dB)"]));
-            dV3 = Math.max(...points.map(p => p["Velocity (cm/s)"]));
+            //dV2 = Math.max(...points.map(p => p["SNR (dB)"]));
+            dV2 = points.filter(p => 
+              p["Q201 (flag)"] != 1 ||
+              p["Q202 (flag)"] != 1 ||
+              p["Q203 (flag)"] != 1 ||
+              p["Q204 (flag)"] != 1 ||
+              p["Q205 (flag)"] != 1 ||
+              p["Q206 (flag)"] != 1 ||
+              p["Q207 (flag)"] != 1).length;
+            dV3 = Math.max(...points.map(p => Math.abs(p["Velocity (cm/s)"])));
           }
           dataSeries1.push([tmstNum, dataValue]);
           dataSeries2.push([tmstNum, dV2]);
@@ -220,7 +233,7 @@ export default {
         }
 
         this.chartOptions.series[0].name = 'Num points';
-        this.chartOptions.series[1].name = 'SNR (dB)';
+        this.chartOptions.series[1].name = 'Flagged points';
         this.chartOptions.series[2].name = 'Max Velocity';
 
         this.chartOptions.series[0].data = dataSeries1;
