@@ -34,21 +34,20 @@ export default {
           text: 'Source: icatmar.cat'
         },
         xAxis: [{
-          categories: [
-            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-          ],
+          type: 'datetime',
+          tickInterval: 3600 * 1000,
+          ordinal: false,
           crosshair: true
         }],
         yAxis: [{ // Primary yAxis
-          labels: {
-            format: '{value}°C',
+          title: {
+            text: 'Num. points',
             style: {
               color: Highcharts.getOptions().colors[2]
             }
           },
-          title: {
-            text: 'Temperature',
+          labels: {
+            format: '{value} points',
             style: {
               color: Highcharts.getOptions().colors[2]
             }
@@ -58,13 +57,13 @@ export default {
         }, { // Secondary yAxis
           gridLineWidth: 0,
           title: {
-            text: 'Rainfall',
+            text: 'SNR (dB)',
             style: {
               color: Highcharts.getOptions().colors[0]
             }
           },
           labels: {
-            format: '{value} mm',
+            format: '{value} dB SNR',
             style: {
               color: Highcharts.getOptions().colors[0]
             }
@@ -73,13 +72,13 @@ export default {
         }, { // Tertiary yAxis
           gridLineWidth: 0,
           title: {
-            text: 'Sea-Level Pressure',
+            text: 'Spatial Count',
             style: {
               color: Highcharts.getOptions().colors[1]
             }
           },
           labels: {
-            format: '{value} mb',
+            format: '{value} points',
             style: {
               color: Highcharts.getOptions().colors[1]
             }
@@ -101,41 +100,33 @@ export default {
             'rgba(255,255,255,0.25)'
         },
         series: [{
-          name: 'Rainfall',
+          name: 'Num. points',
           type: 'column',
-          yAxis: 1,
-          data: [
-            49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1,
-            95.6, 54.4
-          ],
+          yAxis: 0,
+          data: [],
           tooltip: {
-            valueSuffix: ' mm'
+            valueSuffix: ' points'
           }
-
         }, {
-          name: 'Sea-Level Pressure',
+          name: 'Range Cells',
           type: 'spline',
-          yAxis: 2,
-          data: [
-            1016, 1016, 1015.9, 1015.5, 1012.3, 1009.5, 1009.6, 1010.2, 1013.1,
-            1016.9, 1018.2, 1016.7
-          ],
+          yAxis: 1,
+          data: [],
           marker: {
             enabled: false
           },
           dashStyle: 'shortdot',
           tooltip: {
-            valueSuffix: ' mb'
+            valueSuffix: ' dB'
           }
 
         }, {
-          name: 'Temperature',
+          name: 'Spatial Count',
           type: 'spline',
-          data: [
-            7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6
-          ],
+          yAxis: 2,
+          data: [],
           tooltip: {
-            valueSuffix: ' °C'
+            valueSuffix: ' points'
           }
         }],
         responsive: {
@@ -195,9 +186,47 @@ export default {
 
       // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
       window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
-        console.log('Loaded timestamps: ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
+        console.log('Loaded timestamps of ' + this.antennaID + ': ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
       }).then(res => {
-        console.log(res);
+        // Generate chart data
+        let dataSeries1 = [];
+        let dataSeries2 = [];
+        let dataSeries3 = [];
+        for (let i = 0; i < timestamps.length; i++) {
+          // Assign timestamp
+          let tmst = timestamps[i];
+          let tmstNum = new Date(tmst).getTime();
+          // this.chartOptions.series[0].data[0].push(new Date(tmst).getTime());
+          // this.chartOptions.series[1].data[0].push(new Date(tmst).getTime());7
+          // this.chartOptions.series[2].data[0].push(new Date(tmst).getTime());7
+          // Get data value
+          let radarData = window.DataManager.HFRadars[this.antennaID];
+          if (radarData == undefined) { debugger; }
+          let points = radarData.data[tmst];
+          let header = radarData.headers[tmst];
+          let waveHourlyData = radarData.waveHourlyData[tmst];
+          let windHourlyData = radarData.windHourlyData[tmst];
+          let dataValue = 0
+          let dV2 = 0;
+          let dV3 = 0;
+          if (points != undefined) {
+            dataValue = points.length;
+            dV2 = Math.max(...points.map(p => p["SNR (dB)"]));
+            dV3 = Math.max(...points.map(p => p["Velocity (cm/s)"]));
+          }
+          dataSeries1.push([tmstNum, dataValue]);
+          dataSeries2.push([tmstNum, dV2]);
+          dataSeries3.push([tmstNum, dV3]);
+        }
+
+        this.chartOptions.series[0].name = 'Num points';
+        this.chartOptions.series[1].name = 'SNR (dB)';
+        this.chartOptions.series[2].name = 'Max Velocity';
+
+        this.chartOptions.series[0].data = dataSeries1;
+        this.chartOptions.series[1].data = dataSeries2;
+        this.chartOptions.series[2].data = dataSeries3;
+        //console.log(res);
       }).catch(e => { debugger; });
     }
   },
