@@ -5,6 +5,30 @@
     <!-- Radials title -->
     <div class="title">{{ $t('HF Radars network status') }}</div>
     <div class="options-container">
+      <!-- Select axis table -->
+      <table>
+        <tr>
+          <th>{{$t('Name')}}</th>
+          <th>{{$t('Description')}}</th>
+          <th>{{$t('Options')}}</th>
+        </tr>
+        <tr v-for="ax in axisData">
+          <td>{{ ax.name }}</td>
+          <td>{{ ax.description }}</td>
+          <td class="options-td">
+            <button v-for="opt in ax.options">{{ opt }}</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+
+    <!-- Selected axis -->
+    <div class="selected-axis-container">
+      <button v-for="sAx in selectedAxis">{{ sAx.name }}</button>
+      <button>{{ $t('Visualize more data +') }}</button>
+    </div>
+    <div class="options-container">
       <button @click="loadPrevious24h">
         <{{ $t('Load previous 24h') }}</button>
     </div>
@@ -14,7 +38,7 @@
         <!-- <div>{{ rr }}</div> -->
         <div class="graph-radar-map-container">
           <div class="graph-container">
-            <Chart ref='chart' :antennaID=rr />
+            <Chart ref='chart' :antennaID=rr :axisData="selectedAxis" />
           </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
@@ -35,20 +59,23 @@
 <script>
 import TopIcons from './components/TopIcons.vue';
 import Chart from './components/RadialChart.vue';
+import axisDataFile from "./components/RadialChartAxis.js";
 
 export default {
   data() {
     return {
       radars: ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'],
+      axisData: axisDataFile,
+      selectedAxis: [axisDataFile[0]],
     }
 
   },
   methods: {
-    loadPrevious24h(){
+    loadPrevious24h() {
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
         chartComp.load24hMore();
-        
+
       }
     }
   },
@@ -133,6 +160,21 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+}
+
+
+.options-td {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+.selected-axis-container {
+  display: flex;
+  justify-content: center;
 }
 
 /* .img-radar-container {

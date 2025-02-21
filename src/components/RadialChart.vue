@@ -17,13 +17,17 @@ import HighchartsVue from 'highcharts-vue';
 import { Transition } from 'vue';
 // https://www.highcharts.com/demo/highcharts/combo-multi-axes
 
-import axisData from "./RadialChartAxis.js";
+//import axisData from "./RadialChartAxis.js";
 
 export default {
   props: {
     antennaID: {
       type: String,
       required: true
+    },
+    axisData: {
+      type: Object,
+      required: true,
     }
   },
   mounted() {
@@ -52,52 +56,53 @@ export default {
           ordinal: false,
           crosshair: true
         }],
-        yAxis: [{ // Primary yAxis
+        yAxis: [{ // Default yAxis
           title: {
-            text: 'Num. points',
+            text: this.axisData[0].name,
             style: {
               color: Highcharts.getOptions().colors[0]
             }
           },
           labels: {
-            format: '{value} points',
+            format: this.axisData[0].label,
             style: {
               color: Highcharts.getOptions().colors[0]
             }
           },
           opposite: true
+        },
+          // { // Secondary yAxis
+          //   gridLineWidth: 0,
+          //   title: {
+          //     text: 'Flagged points',
+          //     style: {
+          //       color: Highcharts.getOptions().colors[2]
+          //     }
+          //   },
+          //   labels: {
+          //     format: '{value} flagged points',
+          //     style: {
+          //       color: Highcharts.getOptions().colors[2]
+          //     }
+          //   }
 
-        }, { // Secondary yAxis
-          gridLineWidth: 0,
-          title: {
-            text: 'Flagged points',
-            style: {
-              color: Highcharts.getOptions().colors[2]
-            }
-          },
-          labels: {
-            format: '{value} flagged points',
-            style: {
-              color: Highcharts.getOptions().colors[2]
-            }
-          }
-
-        }, { // Tertiary yAxis
-          gridLineWidth: 0,
-          title: {
-            text: 'Max. velocity',
-            style: {
-              color: Highcharts.getOptions().colors[1]
-            }
-          },
-          labels: {
-            format: '{value} cm/s',
-            style: {
-              color: Highcharts.getOptions().colors[1]
-            }
-          },
-          opposite: true
-        }],
+          // }, { // Tertiary yAxis
+          //   gridLineWidth: 0,
+          //   title: {
+          //     text: 'Max. velocity',
+          //     style: {
+          //       color: Highcharts.getOptions().colors[1]
+          //     }
+          //   },
+          //   labels: {
+          //     format: '{value} cm/s',
+          //     style: {
+          //       color: Highcharts.getOptions().colors[1]
+          //     }
+          //   },
+          //   opposite: true
+          // }
+        ],
         tooltip: {
           shared: true,
           xDateFormat: '%Y-%m-%d %Hh',
@@ -115,39 +120,40 @@ export default {
         },
         series: [{
           // Primary
-          name: 'Num. points',
-          type: 'column',
+          name: this.axisData[0].name,
+          type: this.axisData[0].type,
           yAxis: 0,
           data: [],
           tooltip: {
-            valueSuffix: ' points'
+            valueSuffix: ' ' + this.axisData[0].units,
           }
         },
-        // Secondary
-        {
-          name: 'Flagged points',
-          type: 'spline',
-          yAxis: 1,
-          data: [],
-          marker: {
-            enabled: false
-          },
-          dashStyle: 'shortdot',
-          tooltip: {
-            valueSuffix: ' points'
-          }
+          // Secondary
+          // {
+          //   name: 'Flagged points',
+          //   type: 'spline',
+          //   yAxis: 1,
+          //   data: [],
+          //   marker: {
+          //     enabled: false
+          //   },
+          //   dashStyle: 'shortdot',
+          //   tooltip: {
+          //     valueSuffix: ' points'
+          //   }
 
-        },
-        // Tertiary
-        {
-          name: 'Max. velocity',
-          type: 'spline',
-          yAxis: 2,
-          data: [],
-          tooltip: {
-            valueSuffix: ' cm/s'
-          }
-        }],
+          // },
+          // // Tertiary
+          // {
+          //   name: 'Max. velocity',
+          //   type: 'spline',
+          //   yAxis: 2,
+          //   data: [],
+          //   tooltip: {
+          //     valueSuffix: ' cm/s'
+          //   }
+          // }
+        ],
         responsive: {
           rules: [{
             condition: {
@@ -169,16 +175,18 @@ export default {
                   y: -6
                 },
                 showLastLabel: false
-              }, {
-                labels: {
-                  align: 'left',
-                  x: 0,
-                  y: -6
-                },
-                showLastLabel: false
-              }, {
-                visible: false
-              }]
+              }, 
+              // {
+              //   labels: {
+              //     align: 'left',
+              //     x: 0,
+              //     y: -6
+              //   },
+              //   showLastLabel: false
+              // }, {
+              //   visible: false
+              // }
+            ]
             }
           }]
         }
@@ -248,12 +256,12 @@ export default {
         }
 
         this.chartOptions.series[0].name = 'Num points';
-        this.chartOptions.series[1].name = 'Flagged points';
-        this.chartOptions.series[2].name = 'Max Velocity';
+        //this.chartOptions.series[1].name = 'Flagged points';
+        //this.chartOptions.series[2].name = 'Max Velocity';
 
         this.chartOptions.series[0].data = dataSeries1;
-        this.chartOptions.series[1].data = dataSeries2;
-        this.chartOptions.series[2].data = dataSeries3;
+        //this.chartOptions.series[1].data = dataSeries2;
+        //this.chartOptions.series[2].data = dataSeries3;
         //console.log(res);
       }).catch(e => { debugger; });
     },
@@ -320,8 +328,8 @@ export default {
         }
 
         this.chartOptions.series[0].data = [...this.chartOptions.series[0].data, ...dataSeries1];
-        this.chartOptions.series[1].data  = [...this.chartOptions.series[1].data, ...dataSeries2];
-        this.chartOptions.series[2].data = [...this.chartOptions.series[2].data, ...dataSeries3];
+        //this.chartOptions.series[1].data = [...this.chartOptions.series[1].data, ...dataSeries2];
+        //this.chartOptions.series[2].data = [...this.chartOptions.series[2].data, ...dataSeries3];
       });
 
     }

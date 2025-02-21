@@ -5,7 +5,7 @@ export default [
     description: "Counts the number of points of the data provided by a radar at a given hour.",
     units: "points",
     label: "{value} points",
-    options: ["All", "Only valid"],
+    options: ["All", "Only valid points"],
     calculate: (points, option) => {
       if (points == undefined)
         return 0;
