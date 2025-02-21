@@ -17,7 +17,7 @@ import HighchartsVue from 'highcharts-vue';
 import { Transition } from 'vue';
 // https://www.highcharts.com/demo/highcharts/combo-multi-axes
 
-
+import axisData from "./RadialChartAxis.js";
 
 export default {
   props: {
