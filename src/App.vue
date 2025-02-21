@@ -4,13 +4,17 @@
   <div class="main-container">
     <!-- Radials title -->
     <div class="title">{{ $t('HF Radars network status') }}</div>
+    <div class="options-container">
+      <button @click="loadPrevious24h">
+        <{{ $t('Load previous 24h') }}</button>
+    </div>
     <!-- Temporal status radials -->
     <div class="graphs-radars-container">
       <div class="graph-radar-container" v-for="rr in radars">
         <!-- <div>{{ rr }}</div> -->
         <div class="graph-radar-map-container">
           <div class="graph-container">
-            <Chart :antennaID=rr />
+            <Chart ref='chart' :antennaID=rr />
           </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
@@ -28,11 +32,31 @@
 </template>
 
 
-<script setup>
+<script>
 import TopIcons from './components/TopIcons.vue';
 import Chart from './components/RadialChart.vue';
 
-const radars = ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'];
+export default {
+  data() {
+    return {
+      radars: ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'],
+    }
+
+  },
+  methods: {
+    loadPrevious24h(){
+      for (let i = 0; i < this.radars.length; i++) {
+        let chartComp = this.$refs.chart[i];
+        chartComp.load24hMore();
+        
+      }
+    }
+  },
+  components: {
+    TopIcons,
+    Chart
+  }
+}
 </script>
 
 

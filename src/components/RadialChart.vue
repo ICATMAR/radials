@@ -256,6 +256,74 @@ export default {
         this.chartOptions.series[2].data = dataSeries3;
         //console.log(res);
       }).catch(e => { debugger; });
+    },
+
+
+
+    // PUBLIC
+    load24hMore() {
+      if (this.currentHoursBackInTime == undefined) {
+        this.currentHoursBackInTime = 24;
+      }
+
+      let timestamps = [];
+      // 24 back in time
+      let date = new Date();
+      let dateISO = date.toISOString();
+      date.setUTCHours(date.getUTCHours() - this.currentHoursBackInTime); // One hour less
+      this.currentHoursBackInTime += 24;
+      // Back in time
+      for (let i = 0; i < 24; i++) {
+        if (i > 0)
+          date.setUTCHours(date.getUTCHours() - 1); // One hour less
+        dateISO = date.toISOString();
+        dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
+        timestamps.push(dateISO);
+      }
+
+      // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
+      this.progress = 0;
+      window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
+        //console.log('Loaded timestamps of ' + this.antennaID + ': ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
+        this.progress = parseInt((tmstsLoaded / totalTmstsToLoad) * 100);
+      }).then(res => {
+        let dataSeries1 = [];
+        let dataSeries2 = [];
+        let dataSeries3 = [];
+        for (let i = 0; i < timestamps.length; i++) {
+          // Assign timestamp
+          let tmst = timestamps[i];
+          let tmstNum = new Date(tmst).getTime();
+          // Get radar object from DataManager
+          let radarData = window.DataManager.HFRadars[this.antennaID];
+          let points = radarData.data[tmst];
+
+          let dataValue = 0
+          let dV2 = 0;
+          let dV3 = 0;
+          if (points != undefined) {
+            dataValue = points.length;
+            //dV2 = Math.max(...points.map(p => p["SNR (dB)"]));
+            dV2 = points.filter(p =>
+              p["Q201 (flag)"] != 1 ||
+              p["Q202 (flag)"] != 1 ||
+              p["Q203 (flag)"] != 1 ||
+              p["Q204 (flag)"] != 1 ||
+              p["Q205 (flag)"] != 1 ||
+              p["Q206 (flag)"] != 1 ||
+              p["Q207 (flag)"] != 1).length;
+            dV3 = Math.max(...points.map(p => Math.abs(p["Velocity (cm/s)"])));
+          }
+          dataSeries1.push([tmstNum, dataValue]);
+          dataSeries2.push([tmstNum, dV2]);
+          dataSeries3.push([tmstNum, dV3]);
+        }
+
+        this.chartOptions.series[0].data = [...this.chartOptions.series[0].data, ...dataSeries1];
+        this.chartOptions.series[1].data  = [...this.chartOptions.series[1].data, ...dataSeries2];
+        this.chartOptions.series[2].data = [...this.chartOptions.series[2].data, ...dataSeries3];
+      });
+
     }
   },
 };
