@@ -4,19 +4,19 @@
   <div class="main-container">
     <!-- Radials title -->
     <div class="title">{{ $t('HF Radars network status') }}</div>
-    <div class="options-container">
+    <div class="options-container" @click="isVariablesTableVisible = false" v-show="isVariablesTableVisible">
       <!-- Select axis table -->
       <table>
         <tr>
-          <th>{{$t('Name')}}</th>
-          <th>{{$t('Description')}}</th>
-          <th>{{$t('Options')}}</th>
+          <th>{{ $t('Name') }}</th>
+          <th>{{ $t('Description') }}</th>
+          <th>{{ $t('Options') }}</th>
         </tr>
         <tr v-for="ax in axisData">
           <td>{{ ax.name }}</td>
           <td>{{ ax.description }}</td>
           <td class="options-td">
-            <button v-for="opt in ax.options">{{ opt }}</button>
+            <button @click="() => addAxis(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
           </td>
         </tr>
       </table>
@@ -26,7 +26,7 @@
     <!-- Selected axis -->
     <div class="selected-axis-container">
       <button v-for="sAx in selectedAxis">{{ sAx.name }}</button>
-      <button>{{ $t('Visualize more data +') }}</button>
+      <button @click="isVariablesTableVisible = true">{{ $t('Visualize more data +') }}</button>
     </div>
     <div class="options-container">
       <button @click="loadPrevious24h">
@@ -67,6 +67,7 @@ export default {
       radars: ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'],
       axisData: axisDataFile,
       selectedAxis: [axisDataFile[0]],
+      isVariablesTableVisible: false,
     }
 
   },
@@ -76,6 +77,14 @@ export default {
         let chartComp = this.$refs.chart[i];
         chartComp.load24hMore();
 
+      }
+    },
+
+    addAxis(axis, opt) {
+      this.selectedAxis.push(axis);
+      for (let i = 0; i < this.radars.length; i++) {
+        let chartComp = this.$refs.chart[i];
+        chartComp.addAxis(axis, opt);
       }
     }
   },

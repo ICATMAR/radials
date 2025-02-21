@@ -32,11 +32,20 @@ export default {
   },
   mounted() {
     this.getRadarData();
+    // Store axis on chart so we can load more data
+    this.axisData[0].selOpt = this.axisData[0].options[0]; // Default option
+    this.currentAxis.push(this.axisData[0]);
   },
   data() {
     return {
       // Progress bar
       progress: 0,
+      // Hours in timeline
+      currentHoursBackInTime: 24,
+      // Requested timestamps
+      reqTimestamps: [],
+      // Current axis
+      currentAxis: [],
       // Highcharts
       chartOptions: {
         chart: {
@@ -175,18 +184,18 @@ export default {
                   y: -6
                 },
                 showLastLabel: false
-              }, 
-              // {
-              //   labels: {
-              //     align: 'left',
-              //     x: 0,
-              //     y: -6
-              //   },
-              //   showLastLabel: false
-              // }, {
-              //   visible: false
-              // }
-            ]
+              },
+                // {
+                //   labels: {
+                //     align: 'left',
+                //     x: 0,
+                //     y: -6
+                //   },
+                //   showLastLabel: false
+                // }, {
+                //   visible: false
+                // }
+              ]
             }
           }]
         }
@@ -197,19 +206,20 @@ export default {
 
     getRadarData() {
       let timestamps = [];
-      // Last 24 h?
+      // Last currentHoursBackInTime
       let date = new Date();
       let dateISO = date.toISOString();
       dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
       timestamps.push(dateISO);
       // Back in time
       date = new Date(dateISO);
-      for (let i = 1; i < 24; i++) {
+      for (let i = 1; i < this.currentHoursBackInTime; i++) {
         date.setUTCHours(date.getUTCHours() - 1); // One hour less
         dateISO = date.toISOString();
         dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
         timestamps.push(dateISO);
       }
+      this.reqTimestamps = this.reqTimestamps.concat(timestamps);
 
       // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
       window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
@@ -269,10 +279,62 @@ export default {
 
 
     // PUBLIC
-    load24hMore() {
-      if (this.currentHoursBackInTime == undefined) {
-        this.currentHoursBackInTime = 24;
+    addAxis(axis, option) {
+      
+      // Store axis config in case we want to load more data later
+      axis.selOpt = option;
+      this.currentAxis.push(axis);
+
+      let data = [];
+
+      // Create data
+      // Iterate timestamps
+      for (let i = 0; i < this.reqTimestamps.length; i++) {
+        // Get data value
+        let tmst = this.reqTimestamps[i];
+        let radarData = window.DataManager.HFRadars[this.antennaID];
+        if (radarData == undefined) { debugger; }
+        // Calculate value and store
+        let points = radarData.data[tmst];
+        let value = axis.calculate(points, option);
+        data.push([new Date(tmst).getTime(), value]);
       }
+
+      // Integrate axis in highcharts data structure
+      // yAxis
+      this.chartOptions.yAxis.push({
+        title: {
+          text: axis.name,
+          style: {
+            color: Highcharts.getOptions().colors[this.currentAxis.length - 1],
+          }
+        },
+        labels: {
+          format: axis.label,
+          style: {
+            color: Highcharts.getOptions().colors[this.currentAxis.length - 1],
+          }
+        }
+      });
+      // series
+      this.chartOptions.series.push({
+        name: axis.name,
+        type: axis.type,
+        data: data,
+        marker: {enabled: false},
+        //dashStyle: 'shortdot',
+        tooltip: {
+          valueSuffix: ' ' + axis.units,
+        }
+      });
+      // Responsive?
+    },
+
+
+
+
+    // Load 24 files more
+    load24hMore() {
 
       let timestamps = [];
       // 24 back in time
@@ -288,6 +350,7 @@ export default {
         dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
         timestamps.push(dateISO);
       }
+      this.reqTimestamps = this.reqTimestamps.concat(timestamps);
 
       // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
       this.progress = 0;
