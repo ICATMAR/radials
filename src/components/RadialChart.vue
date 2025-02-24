@@ -48,6 +48,8 @@ export default {
       reqTimestamps: [],
       // Current axis
       currentAxes: [],
+      // Num points should share the same axis
+      numPointsAxisIndex: undefined,
       // Highcharts
       chartOptions: {
         chart: {
@@ -228,6 +230,9 @@ export default {
         // Calculate value and store
         let points = radarData.data[tmst];
         let value = axis.calculate(points, option);
+        if (option == 'Average'){
+          value = parseFloat(value.toFixed(1));
+        }
         data.push([new Date(tmst).getTime(), value]);
       }
 
@@ -235,6 +240,7 @@ export default {
       let currentAxisIndex = this.currentAxes.length - 1;
       // yAxis
       this.chartOptions.yAxis[currentAxisIndex] = {
+        visible: currentAxisIndex == 0,
         title: {
           text: axis.name,
           style: {
@@ -245,15 +251,23 @@ export default {
           format: axis.label,
           style: {
             color: Highcharts.getOptions().colors[this.currentAxes.length - 1],
-          }
+          },
+          visible: false,
         }
       };
       // series
+      // yAxis common for Nº points
+      let isPointsAxis = axis.name.includes('Nº') && axis.name.includes('points');
+      // First definition
+      if (isPointsAxis && this.numPointsAxisIndex == undefined){
+        this.numPointsAxisIndex = currentAxisIndex;
+      }
       this.chartOptions.series[currentAxisIndex] = {
         name: axis.name,
         type: axis.type,
+        yAxis: isPointsAxis ? this.numPointsAxisIndex : currentAxisIndex,
         data: data,
-        marker: { enabled: false },
+        marker: { enabled: true },
         //dashStyle: 'shortdot',
         tooltip: {
           valueSuffix: ' ' + axis.units,
