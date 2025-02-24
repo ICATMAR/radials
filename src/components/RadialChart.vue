@@ -17,7 +17,7 @@ import HighchartsVue from 'highcharts-vue';
 import { Transition } from 'vue';
 // https://www.highcharts.com/demo/highcharts/combo-multi-axes
 
-//import axisData from "./RadialChartAxis.js";
+//import axesData from "./RadialChartAxis.js";
 
 export default {
   props: {
@@ -25,27 +25,29 @@ export default {
       type: String,
       required: true
     },
-    axisData: {
+    axesData: {
       type: Object,
       required: true,
     }
   },
   mounted() {
-    this.getRadarData();
-    // Store axis on chart so we can load more data
-    this.axisData[0].selOpt = this.axisData[0].options[0]; // Default option
-    this.currentAxis.push(this.axisData[0]);
+    // Add input axes to currentAxes
+    for (let i = 0; i < this.axesData.length; i++) {
+      this.currentAxes.push(this.axesData[i]);
+    }
+    // Load 24 first hours
+    this.load24hMore();
   },
   data() {
     return {
       // Progress bar
       progress: 0,
       // Hours in timeline
-      currentHoursBackInTime: 24,
+      currentHoursBackInTime: 0,
       // Requested timestamps
       reqTimestamps: [],
       // Current axis
-      currentAxis: [],
+      currentAxes: [],
       // Highcharts
       chartOptions: {
         chart: {
@@ -65,21 +67,22 @@ export default {
           ordinal: false,
           crosshair: true
         }],
-        yAxis: [{ // Default yAxis
-          title: {
-            text: this.axisData[0].name,
-            style: {
-              color: Highcharts.getOptions().colors[0]
-            }
-          },
-          labels: {
-            format: this.axisData[0].label,
-            style: {
-              color: Highcharts.getOptions().colors[0]
-            }
-          },
-          opposite: true
-        },
+        yAxis: [
+          //   { // Default yAxis
+          //   title: {
+          //     text: this.axesData[0].name,
+          //     style: {
+          //       color: Highcharts.getOptions().colors[0]
+          //     }
+          //   },
+          //   labels: {
+          //     format: this.axesData[0].label,
+          //     style: {
+          //       color: Highcharts.getOptions().colors[0]
+          //     }
+          //   },
+          //   opposite: true
+          // },
           // { // Secondary yAxis
           //   gridLineWidth: 0,
           //   title: {
@@ -121,22 +124,23 @@ export default {
           align: 'left',
           x: 80,
           verticalAlign: 'top',
-          y: 55,
+          y: 0,
           floating: true,
           backgroundColor:
             Highcharts.defaultOptions.legend.backgroundColor || // theme
             'rgba(255,255,255,0.25)'
         },
-        series: [{
-          // Primary
-          name: this.axisData[0].name,
-          type: this.axisData[0].type,
-          yAxis: 0,
-          data: [],
-          tooltip: {
-            valueSuffix: ' ' + this.axisData[0].units,
-          }
-        },
+        series: [
+          //   {
+          //   // Primary
+          //   name: this.axesData[0].name,
+          //   type: this.axesData[0].type,
+          //   yAxis: 0,
+          //   data: [],
+          //   tooltip: {
+          //     valueSuffix: ' ' + this.axesData[0].units,
+          //   }
+          // },
           // Secondary
           // {
           //   name: 'Flagged points',
@@ -177,14 +181,15 @@ export default {
                 x: 0,
                 y: 0
               },
-              yAxis: [{
-                labels: {
-                  align: 'right',
-                  x: 0,
-                  y: -6
-                },
-                showLastLabel: false
-              },
+              yAxis: [
+                //   {
+                //   labels: {
+                //     align: 'right',
+                //     x: 0,
+                //     y: -6
+                //   },
+                //   showLastLabel: false
+                // },
                 // {
                 //   labels: {
                 //     align: 'left',
@@ -204,86 +209,12 @@ export default {
   },
   methods: {
 
-    getRadarData() {
-      let timestamps = [];
-      // Last currentHoursBackInTime
-      let date = new Date();
-      let dateISO = date.toISOString();
-      dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
-      timestamps.push(dateISO);
-      // Back in time
-      date = new Date(dateISO);
-      for (let i = 1; i < this.currentHoursBackInTime; i++) {
-        date.setUTCHours(date.getUTCHours() - 1); // One hour less
-        dateISO = date.toISOString();
-        dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
-        timestamps.push(dateISO);
-      }
-      this.reqTimestamps = this.reqTimestamps.concat(timestamps);
-
-      // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
-      window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
-        //console.log('Loaded timestamps of ' + this.antennaID + ': ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
-        this.progress = parseInt((tmstsLoaded / totalTmstsToLoad) * 100);
-      }).then(res => {
-        // Generate chart data
-        let dataSeries1 = [];
-        let dataSeries2 = [];
-        let dataSeries3 = [];
-        for (let i = 0; i < timestamps.length; i++) {
-          // Assign timestamp
-          let tmst = timestamps[i];
-          let tmstNum = new Date(tmst).getTime();
-          // this.chartOptions.series[0].data[0].push(new Date(tmst).getTime());
-          // this.chartOptions.series[1].data[0].push(new Date(tmst).getTime());7
-          // this.chartOptions.series[2].data[0].push(new Date(tmst).getTime());7
-          // Get data value
-          let radarData = window.DataManager.HFRadars[this.antennaID];
-          if (radarData == undefined) { debugger; }
-          let points = radarData.data[tmst];
-          let header = radarData.headers[tmst];
-          let waveHourlyData = radarData.waveHourlyData[tmst];
-          let windHourlyData = radarData.windHourlyData[tmst];
-          let dataValue = 0
-          let dV2 = 0;
-          let dV3 = 0;
-          if (points != undefined) {
-            dataValue = points.length;
-            //dV2 = Math.max(...points.map(p => p["SNR (dB)"]));
-            dV2 = points.filter(p =>
-              p["Q201 (flag)"] != 1 ||
-              p["Q202 (flag)"] != 1 ||
-              p["Q203 (flag)"] != 1 ||
-              p["Q204 (flag)"] != 1 ||
-              p["Q205 (flag)"] != 1 ||
-              p["Q206 (flag)"] != 1 ||
-              p["Q207 (flag)"] != 1).length;
-            dV3 = Math.max(...points.map(p => Math.abs(p["Velocity (cm/s)"])));
-          }
-          dataSeries1.push([tmstNum, dataValue]);
-          dataSeries2.push([tmstNum, dV2]);
-          dataSeries3.push([tmstNum, dV3]);
-        }
-
-        this.chartOptions.series[0].name = 'Num points';
-        //this.chartOptions.series[1].name = 'Flagged points';
-        //this.chartOptions.series[2].name = 'Max Velocity';
-
-        this.chartOptions.series[0].data = dataSeries1;
-        //this.chartOptions.series[1].data = dataSeries2;
-        //this.chartOptions.series[2].data = dataSeries3;
-        //console.log(res);
-      }).catch(e => { debugger; });
-    },
-
-
-
     // PUBLIC
     addAxis(axis, option) {
-      
+
       // Store axis config in case we want to load more data later
-      axis.selOpt = option;
-      this.currentAxis.push(axis);
+      axis.selOption = option || axis.options[0];
+      this.currentAxes.push(axis);
 
       let data = [];
 
@@ -301,32 +232,33 @@ export default {
       }
 
       // Integrate axis in highcharts data structure
+      let currentAxisIndex = this.currentAxes.length - 1;
       // yAxis
-      this.chartOptions.yAxis.push({
+      this.chartOptions.yAxis[currentAxisIndex] = {
         title: {
           text: axis.name,
           style: {
-            color: Highcharts.getOptions().colors[this.currentAxis.length - 1],
+            color: Highcharts.getOptions().colors[this.currentAxes.length - 1],
           }
         },
         labels: {
           format: axis.label,
           style: {
-            color: Highcharts.getOptions().colors[this.currentAxis.length - 1],
+            color: Highcharts.getOptions().colors[this.currentAxes.length - 1],
           }
         }
-      });
+      };
       // series
-      this.chartOptions.series.push({
+      this.chartOptions.series[currentAxisIndex] = {
         name: axis.name,
         type: axis.type,
         data: data,
-        marker: {enabled: false},
+        marker: { enabled: false },
         //dashStyle: 'shortdot',
         tooltip: {
           valueSuffix: ' ' + axis.units,
         }
-      });
+      };
       // Responsive?
     },
 
@@ -354,46 +286,31 @@ export default {
 
       // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
       this.progress = 0;
-      window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
+      return window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
         //console.log('Loaded timestamps of ' + this.antennaID + ': ' + tmstsLoaded + ' of ' + totalTmstsToLoad);
         this.progress = parseInt((tmstsLoaded / totalTmstsToLoad) * 100);
       }).then(res => {
-        let dataSeries1 = [];
-        let dataSeries2 = [];
-        let dataSeries3 = [];
-        for (let i = 0; i < timestamps.length; i++) {
-          // Assign timestamp
-          let tmst = timestamps[i];
-          let tmstNum = new Date(tmst).getTime();
-          // Get radar object from DataManager
-          let radarData = window.DataManager.HFRadars[this.antennaID];
-          let points = radarData.data[tmst];
-
-          let dataValue = 0
-          let dV2 = 0;
-          let dV3 = 0;
-          if (points != undefined) {
-            dataValue = points.length;
-            //dV2 = Math.max(...points.map(p => p["SNR (dB)"]));
-            dV2 = points.filter(p =>
-              p["Q201 (flag)"] != 1 ||
-              p["Q202 (flag)"] != 1 ||
-              p["Q203 (flag)"] != 1 ||
-              p["Q204 (flag)"] != 1 ||
-              p["Q205 (flag)"] != 1 ||
-              p["Q206 (flag)"] != 1 ||
-              p["Q207 (flag)"] != 1).length;
-            dV3 = Math.max(...points.map(p => Math.abs(p["Velocity (cm/s)"])));
+        let hasData = false;
+        for (let i = 0; i < res.length; i++) {
+          if (res[i].status == 'fulfilled') {
+            hasData = true;
           }
-          dataSeries1.push([tmstNum, dataValue]);
-          dataSeries2.push([tmstNum, dV2]);
-          dataSeries3.push([tmstNum, dV3]);
         }
-
-        this.chartOptions.series[0].data = [...this.chartOptions.series[0].data, ...dataSeries1];
-        //this.chartOptions.series[1].data = [...this.chartOptions.series[1].data, ...dataSeries2];
-        //this.chartOptions.series[2].data = [...this.chartOptions.series[2].data, ...dataSeries3];
-      });
+        return hasData;
+      }).then(hasData => {
+        if (hasData == false) {
+          // If no data, show the option to load more?
+          debugger;
+        } else {
+          // Refill the charts with the currentAxes
+          // Reset currentAxes as addAxis refills array
+          let tempAxes = this.currentAxes;
+          this.currentAxes = [];
+          for (let i = 0; i < tempAxes.length; i++) {
+            this.addAxis(tempAxes[i], tempAxes[i].selOption);
+          }
+        }
+      }).catch(e => { throw e });
 
     }
   },

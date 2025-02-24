@@ -12,7 +12,7 @@
           <th>{{ $t('Description') }}</th>
           <th>{{ $t('Options') }}</th>
         </tr>
-        <tr v-for="ax in axisData">
+        <tr v-for="ax in axesData">
           <td>{{ ax.name }}</td>
           <td>{{ ax.description }}</td>
           <td class="options-td">
@@ -25,7 +25,7 @@
 
     <!-- Selected axis -->
     <div class="selected-axis-container">
-      <button v-for="sAx in selectedAxis">{{ sAx.name }}</button>
+      <button v-for="sAx in selectedAxes">{{ sAx.name }}</button>
       <button @click="isVariablesTableVisible = true">{{ $t('Visualize more data +') }}</button>
     </div>
     <div class="options-container">
@@ -38,7 +38,7 @@
         <!-- <div>{{ rr }}</div> -->
         <div class="graph-radar-map-container">
           <div class="graph-container">
-            <Chart ref='chart' :antennaID=rr :axisData="selectedAxis" />
+            <Chart ref='chart' :antennaID=rr :axesData="selectedAxes" />
           </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
@@ -59,14 +59,14 @@
 <script>
 import TopIcons from './components/TopIcons.vue';
 import Chart from './components/RadialChart.vue';
-import axisDataFile from "./components/RadialChartAxis.js";
+import axesDataFile from "./components/RadialChartAxis.js";
 
 export default {
   data() {
     return {
       radars: ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'],
-      axisData: axisDataFile,
-      selectedAxis: [axisDataFile[0]],
+      axesData: axesDataFile,
+      selectedAxes: [axesDataFile[0]],
       isVariablesTableVisible: false,
     }
 
@@ -76,12 +76,11 @@ export default {
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
         chartComp.load24hMore();
-
       }
     },
 
     addAxis(axis, opt) {
-      this.selectedAxis.push(axis);
+      this.selectedAxes.push(axis);
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
         chartComp.addAxis(axis, opt);

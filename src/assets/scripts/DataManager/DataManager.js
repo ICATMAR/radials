@@ -551,9 +551,15 @@ class DataManager {
           // Iterate results (file loads)
           let validResults = [];
           res.forEach(rr => {
+            // There has been an error not related to file not being found
             if (rr.status == 'rejected' && !rr.reason.message.includes('File not found')) {
               console.error(rr.reason);
-            } else {
+            } 
+            // Error because file does not exist
+            else if (rr.status == 'rejected' && rr.reason.message.includes('File not found')) {
+              throw rr.reason; // File not found error
+            }
+            else {
               validResults.push(rr.value);
               // File data is stored in DataManager. In principle there is no need to return values
               this.addHFRadarData(rr.value)

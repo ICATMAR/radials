@@ -51,7 +51,7 @@ export default [
         return points.filter(p => p[option + " (flag)"] != 1).length;
       }
     },
-    type: "column", // "spline", "column"
+    type: "spline", // "spline", "column"
   },
 
 
