@@ -271,16 +271,24 @@ export default {
         }
       };
       // SERIES - series
+      let yAxisRangeIndex = currentAxisIndex;
       // yAxis common for Nº points
       let isPointsAxis = axis.name.includes('Nº') && axis.name.includes('points');
       // First definition
       if (isPointsAxis && this.numPointsAxisIndex == undefined) {
         this.numPointsAxisIndex = currentAxisIndex;
       }
+      // yAxis common for same series with different options
+      // Find if any series has the same name
+      let similarSeries = this.currentAxes.filter(ax => ax.name == axis.name);
+      if (similarSeries.length > 1){
+        yAxisRangeIndex = this.currentAxes.findIndex(ax => ax.name == axis.name);
+      }
+
       this.chartOptions.series[currentAxisIndex] = {
         name: axis.name,
         type: axis.type,
-        yAxis: isPointsAxis ? this.numPointsAxisIndex : currentAxisIndex,
+        yAxis: isPointsAxis ? this.numPointsAxisIndex : yAxisRangeIndex,
         data: data,
         marker: { enabled: false },
         //dashStyle: 'shortdot',
