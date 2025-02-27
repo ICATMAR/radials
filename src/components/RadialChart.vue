@@ -6,6 +6,12 @@
       <div id="progress-bar" :style="{ width: progress + '%' }"></div>
     </div>
   </Transition>
+
+  <div v-show="showNoData" id="no-data-message">
+    <span>{{ $t('No data for the last 24 requested hours') }}</span>
+    <button @click="showNoData = false">Close</button>
+  </div>
+
   <!-- High charts -->
   <highcharts id="chart" :options="chartOptions"></highcharts>
 
@@ -50,6 +56,8 @@ export default {
       currentAxes: [],
       // Num points should share the same axis
       numPointsAxisIndex: undefined,
+      // When 24h contained no data
+      showNoData: false,
       // Highcharts
       chartOptions: {
         chart: {
@@ -230,7 +238,7 @@ export default {
         // Calculate value and store
         let points = radarData.data[tmst];
         let value = axis.calculate(points, option);
-        if (option == 'Average'){
+        if (option == 'Average') {
           value = parseFloat(value.toFixed(1));
         }
         data.push([new Date(tmst).getTime(), value]);
@@ -259,7 +267,7 @@ export default {
       // yAxis common for Nº points
       let isPointsAxis = axis.name.includes('Nº') && axis.name.includes('points');
       // First definition
-      if (isPointsAxis && this.numPointsAxisIndex == undefined){
+      if (isPointsAxis && this.numPointsAxisIndex == undefined) {
         this.numPointsAxisIndex = currentAxisIndex;
       }
       this.chartOptions.series[currentAxisIndex] = {
@@ -281,6 +289,8 @@ export default {
 
     // Load 24 files more
     load24hMore() {
+
+      this.showNoData = false;
 
       let timestamps = [];
       // 24 back in time
@@ -314,7 +324,8 @@ export default {
       }).then(hasData => {
         if (hasData == false) {
           // If no data, show the option to load more?
-          debugger;
+          this.showNoData = true;
+          return;
         } else {
           // Refill the charts with the currentAxes
           // Reset currentAxes as addAxis refills array
@@ -337,7 +348,13 @@ export default {
 }
 
 #progress-container {
-  position: relative;
+  position: absolute;
+  width: 50%;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
   display: flex;
   justify-content: center;
   background-color: var(--darkBlue);
@@ -359,5 +376,18 @@ export default {
   text-shadow: 0 0 4px black;
 }
 
-/* Add any styles here */
+#no-data-message {
+  position: absolute;
+  width: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: orange;
+  border-radius: 20px;
+}
 </style>

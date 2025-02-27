@@ -150,6 +150,7 @@ export default {
   width: 80%;
   height: 200px;
   background-color: var(--lightBlue);
+  position: relative;
 }
 
 .map-container {
