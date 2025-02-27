@@ -129,6 +129,11 @@ export default {
           shared: true,
           xDateFormat: '%Y-%m-%d %Hh',
         },
+        plotOptions: {
+          dataGrouping: {
+            enabled: true
+          }
+        },
         legend: {
           layout: 'vertical',
           align: 'left',
@@ -246,7 +251,7 @@ export default {
 
       // Integrate axis in highcharts data structure
       let currentAxisIndex = this.currentAxes.length - 1;
-      // yAxis
+      // YAXIS - yAxis
       this.chartOptions.yAxis[currentAxisIndex] = {
         visible: currentAxisIndex == 0,
         title: {
@@ -263,7 +268,7 @@ export default {
           visible: false,
         }
       };
-      // series
+      // SERIES - series
       // yAxis common for Nº points
       let isPointsAxis = axis.name.includes('Nº') && axis.name.includes('points');
       // First definition
@@ -281,7 +286,16 @@ export default {
           valueSuffix: ' ' + axis.units,
         }
       };
-      // Responsive?
+      // RESPONSIVE - responsive
+      this.chartOptions.responsive.rules[0].chartOptions.yAxis[currentAxisIndex] = {
+        showLastLabel: false,
+        title: {
+          text: null
+        },
+        labels: {
+          format: null
+        }
+      }
     },
 
 
@@ -354,7 +368,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
+
   display: flex;
   justify-content: center;
   background-color: var(--darkBlue);
