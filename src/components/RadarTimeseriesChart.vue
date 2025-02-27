@@ -25,7 +25,6 @@ import { Transition } from 'vue';
 // In case of wanting a xAxis navigator
 // https://github.com/highcharts/highcharts-vue#implementing-stockchart-mapchart-and-ganttchart
 
-//import axesData from "./RadialChartAxis.js";
 
 export default {
   props: {
@@ -33,15 +32,15 @@ export default {
       type: String,
       required: true
     },
-    axesData: {
+    radarVarsData: {
       type: Object,
       required: true,
     }
   },
   mounted() {
-    // Add input axes to currentAxes
-    for (let i = 0; i < this.axesData.length; i++) {
-      this.currentAxes.push(this.axesData[i]);
+    // Add input radar var to currentRadarVars
+    for (let i = 0; i < this.radarVarsData.length; i++) {
+      this.currentRadarVars.push(this.radarVarsData[i]);
     }
     // Load 24 first hours
     this.load24hMore();
@@ -54,8 +53,8 @@ export default {
       currentHoursBackInTime: 0,
       // Requested timestamps
       reqTimestamps: [],
-      // Current axis
-      currentAxes: [],
+      // Current radar variable
+      currentRadarVars: [],
       // Num points should share the same axis
       numPointsAxisIndex: undefined,
       // When 24h contained no data
@@ -82,13 +81,13 @@ export default {
         yAxis: [
           //   { // Default yAxis
           //   title: {
-          //     text: this.axesData[0].name,
+          //     text: this.radarVarsData[0].name,
           //     style: {
           //       color: Highcharts.getOptions().colors[0]
           //     }
           //   },
           //   labels: {
-          //     format: this.axesData[0].label,
+          //     format: this.radarVarsData[0].label,
           //     style: {
           //       color: Highcharts.getOptions().colors[0]
           //     }
@@ -150,12 +149,12 @@ export default {
         series: [
           //   {
           //   // Primary
-          //   name: this.axesData[0].name,
-          //   type: this.axesData[0].type,
+          //   name: this.radarVarsData[0].name,
+          //   type: this.radarVarsData[0].type,
           //   yAxis: 0,
           //   data: [],
           //   tooltip: {
-          //     valueSuffix: ' ' + this.axesData[0].units,
+          //     valueSuffix: ' ' + this.radarVarsData[0].units,
           //   }
           // },
           // Secondary
@@ -227,11 +226,11 @@ export default {
   methods: {
 
     // PUBLIC
-    addAxis(axis, option) {
+    addRadarVar(radarVar, option) {
 
-      // Store axis config in case we want to load more data later
-      axis.selOption = option || axis.options[0];
-      this.currentAxes.push(axis);
+      // Store radarVar config in case we want to load more data later
+      radarVar.selOption = option || radarVar.options[0];
+      this.currentRadarVars.push(radarVar);
 
       let data = [];
 
@@ -244,28 +243,28 @@ export default {
         if (radarData == undefined) { debugger; }
         // Calculate value and store
         let points = radarData.data[tmst];
-        let value = axis.calculate(points, option);
-        if (option == 'Average') {
+        let value = radarVar.calculate(points, option);
+        if (value % 1 !== 0) {
           value = parseFloat(value.toFixed(1));
         }
         data.push([new Date(tmst).getTime(), value]);
       }
 
-      // Integrate axis in highcharts data structure
-      let currentAxisIndex = this.currentAxes.length - 1;
+      // Integrate radarVar in highcharts data structure
+      let currentAxisIndex = this.currentRadarVars.length - 1;
       // YAXIS - yAxis
       this.chartOptions.yAxis[currentAxisIndex] = {
         visible: currentAxisIndex == 0,
         title: {
-          text: axis.name,
+          text: radarVar.name,
           style: {
-            color: Highcharts.getOptions().colors[this.currentAxes.length - 1],
+            color: Highcharts.getOptions().colors[this.currentRadarVars.length - 1],
           }
         },
         labels: {
-          format: axis.label,
+          format: radarVar.label,
           style: {
-            color: Highcharts.getOptions().colors[this.currentAxes.length - 1],
+            color: Highcharts.getOptions().colors[this.currentRadarVars.length - 1],
           },
           visible: false,
         }
@@ -273,27 +272,27 @@ export default {
       // SERIES - series
       let yAxisRangeIndex = currentAxisIndex;
       // yAxis common for Nº points
-      let isPointsAxis = axis.name.includes('Nº') && axis.name.includes('points');
+      let isPointsAxis = radarVar.name.includes('Nº') && radarVar.name.includes('points');
       // First definition
       if (isPointsAxis && this.numPointsAxisIndex == undefined) {
         this.numPointsAxisIndex = currentAxisIndex;
       }
       // yAxis common for same series with different options
       // Find if any series has the same name
-      let similarSeries = this.currentAxes.filter(ax => ax.name == axis.name);
+      let similarSeries = this.currentRadarVars.filter(ax => ax.name == radarVar.name);
       if (similarSeries.length > 1){
-        yAxisRangeIndex = this.currentAxes.findIndex(ax => ax.name == axis.name);
+        yAxisRangeIndex = this.currentRadarVars.findIndex(ax => ax.name == radarVar.name);
       }
 
       this.chartOptions.series[currentAxisIndex] = {
-        name: axis.name,
-        type: axis.type,
+        name: radarVar.name,
+        type: radarVar.type,
         yAxis: isPointsAxis ? this.numPointsAxisIndex : yAxisRangeIndex,
         data: data,
         marker: { enabled: false },
         //dashStyle: 'shortdot',
         tooltip: {
-          valueSuffix: ' ' + axis.units,
+          valueSuffix: ' ' + radarVar.units,
         }
       };
       // RESPONSIVE - responsive
@@ -351,12 +350,12 @@ export default {
           this.showNoData = true;
           return;
         } else {
-          // Refill the charts with the currentAxes
-          // Reset currentAxes as addAxis refills array
-          let tempAxes = this.currentAxes;
-          this.currentAxes = [];
-          for (let i = 0; i < tempAxes.length; i++) {
-            this.addAxis(tempAxes[i], tempAxes[i].selOption);
+          // Refill the charts with the currentRadarVars
+          // Reset currentRadarVars as addAxis refills array
+          let tempRadarVar = this.currentRadarVars;
+          this.currentRadarVars = [];
+          for (let i = 0; i < tempRadarVar.length; i++) {
+            this.addRadarVar(tempRadarVar[i], tempRadarVar[i].selOption);
           }
         }
       }).catch(e => { throw e });

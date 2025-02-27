@@ -8,26 +8,26 @@
       <!-- Close -->
       <button @click="isVariablesTableVisible = false">{{ $t('Close') }}</button>
 
-      <!-- Select axis table -->
+      <!-- Select radar variable table -->
       <table>
         <tr class="table-header">
           <th>{{ $t('Name') }}</th>
           <th>{{ $t('Description') }}</th>
           <th>{{ $t('Options') }}</th>
         </tr>
-        <tr v-for="(ax, index) in axesData" :class="[index % 2 == 0 ? 'oddRow' : 'evenRow']">
+        <tr v-for="(ax, index) in radarVarsData" :class="[index % 2 == 0 ? 'oddRow' : 'evenRow']">
           <td class="variable-name-cell">{{ ax.name }}</td>
           <td>{{ ax.description }}</td>
           <td class="options-td">
-            <button @click="() => addAxis(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
+            <button @click="() => addRadarVar(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
           </td>
         </tr>
       </table>
     </div>
 
 
-    <!-- Selected axis -->
-    <div class="selected-axis-container" v-show="!isVariablesTableVisible">
+    <!-- Selected radar variable -->
+    <div class="selected-variable-container" v-show="!isVariablesTableVisible">
       <button v-for="sAx in selectedAxes">{{ sAx.name }} ({{ sAx.selOption }})</button>
       <button @click="isVariablesTableVisible = true">{{ $t('Visualize more data +') }}</button>
     </div>
@@ -43,7 +43,7 @@
       <div class="graph-radar-container" v-for="rr in radars">
         <div class="graph-radar-map-container">
           <div class="graph-container">
-            <Chart ref='chart' :antennaID=rr :axesData="selectedAxes" />
+            <Chart ref='chart' :antennaID=rr :radarVarsData="selectedAxes" />
           </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
@@ -63,16 +63,16 @@
 
 <script>
 import TopIcons from './components/TopIcons.vue';
-import Chart from './components/RadialChart.vue';
-import axesDataFile from "./components/RadialChartAxis.js";
-import RadialVariableClass from "./components/RadialVariableClass.js";
+import Chart from './components/RadarTimeseriesChart.vue';
+import radarVarsDataFile from "./components/RadarVariableDefinitions.js";
+import RadarVariableClass from "./components/RadarVariableClass.js";
 
 export default {
   data() {
     return {
       radars: ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'],
-      axesData: axesDataFile,
-      selectedAxes: [axesDataFile[0]],
+      radarVarsData: radarVarsDataFile,
+      selectedAxes: [radarVarsDataFile[0]],
       isVariablesTableVisible: false,
     }
 
@@ -85,13 +85,13 @@ export default {
       }
     },
 
-    addAxis(axis, opt) {
-      let radarVar = new RadialVariableClass(axis);
+    addRadarVar(radarVarIn, opt) {
+      let radarVar = new RadarVariableClass(radarVarIn);
       radarVar.selOption = opt;
       this.selectedAxes.push(radarVar);
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
-        chartComp.addAxis(radarVar, opt);
+        chartComp.addRadarVar(radarVar, opt);
       }
     }
   },
@@ -219,7 +219,7 @@ table {
 
 
 
-.selected-axis-container {
+.selected-variable-container {
   display: flex;
   justify-content: center;
 }

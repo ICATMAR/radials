@@ -1,4 +1,4 @@
-class RadialVariableClass {
+class RadarVariableClass {
   constructor (variableData){
     this.name = variableData.name;
     this.description= variableData.description;
@@ -10,4 +10,4 @@ class RadialVariableClass {
   }
 }
 
-export default RadialVariableClass;
+export default RadarVariableClass;
