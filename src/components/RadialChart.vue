@@ -22,6 +22,8 @@ import Highcharts from 'highcharts';
 import HighchartsVue from 'highcharts-vue';
 import { Transition } from 'vue';
 // https://www.highcharts.com/demo/highcharts/combo-multi-axes
+// In case of wanting a xAxis navigator
+// https://github.com/highcharts/highcharts-vue#implementing-stockchart-mapchart-and-ganttchart
 
 //import axesData from "./RadialChartAxis.js";
 
@@ -280,7 +282,7 @@ export default {
         type: axis.type,
         yAxis: isPointsAxis ? this.numPointsAxisIndex : currentAxisIndex,
         data: data,
-        marker: { enabled: true },
+        marker: { enabled: false },
         //dashStyle: 'shortdot',
         tooltip: {
           valueSuffix: ' ' + axis.units,
