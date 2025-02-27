@@ -4,7 +4,7 @@ export default [
     name: "Nº points",
     description: "Counts the number of points of the data provided by a radar at a given hour.",
     units: "points",
-    label: "{value} points",
+    label: "{value}",
     options: ["All", "Only valid points"],
     calculate: (points, option) => {
       if (points == undefined)
@@ -32,7 +32,7 @@ export default [
     description: "Counts the number of points of the data provided by a radar at a given hour that have been flagged in the quality checks." +
       "Q201 stands for... Q202 stands for... Q203 stands for... Q204 stands for... Q205 stands for... Q206 stands for... Q207 stands for...",
     units: "flagged points",
-    label: "{value} flagged points",
+    label: "{value}",
     options: ["All", "Q201", "Q202", "Q203", "Q203", "Q204", "Q205", "Q206", "Q207"],
     calculate: (points, option) => {
       if (points == undefined)
@@ -61,7 +61,7 @@ export default [
     name: "Spatial Count",
     description: "Average / maximum / minimum of the spatial count used for each point.",
     units: "spatial count",
-    label: "{value} spatial count",
+    label: "{value}",
     options: ["Average", "Maximum", "Minimum"],
     calculate: (points, option) => {
       if (points == undefined)
@@ -86,7 +86,7 @@ export default [
     name: "Temporal Count",
     description: "Average / maximum / minimum of the temporal count used for each point.",
     units: "temporal count",
-    label: "{value} temporal count",
+    label: "{value}",
     options: ["Average", "Maximum", "Minimum"],
     calculate: (points, option) => {
       if (points == undefined)
@@ -113,7 +113,7 @@ export default [
     name: "Spatial Quality",
     description: "Average / maximum / minimum of the spatial quality of the points.",
     units: "spatial quality",
-    label: "{value} spatial quality",
+    label: "{value}",
     options: ["Average", "Maximum", "Minimum"],
     calculate: (points, option) => {
       if (points == undefined)
@@ -135,7 +135,7 @@ export default [
     name: "Temporal Quality",
     description: "Average / maximum / minimum of the temporal quality of the points.",
     units: "temporal quality",
-    label: "{value} temporal quality",
+    label: "{value}",
     options: ["Average", "Maximum", "Minimum"],
     calculate: (points, option) => {
       if (points == undefined)
@@ -161,7 +161,7 @@ export default [
     name: "SNR",
     description: "Average / maximum / minimum of the signal-to-noise ratio (SNR) of the points.",
     units: "dB SNR",
-    label: "{value} dB SNR",
+    label: "{value}",
     options: ["Average", "Maximum", "Minimum"],
     calculate: (points, option) => {
       if (points == undefined)
