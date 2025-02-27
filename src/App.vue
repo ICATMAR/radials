@@ -4,16 +4,19 @@
   <div class="main-container">
     <!-- Radials title -->
     <div class="title">{{ $t('HF Radars network status') }}</div>
-    <div class="options-container" @click="isVariablesTableVisible = false" v-show="isVariablesTableVisible">
+    <div class="table-container" @click="isVariablesTableVisible = false" v-show="isVariablesTableVisible">
+      <!-- Close -->
+      <button @click="isVariablesTableVisible = false">{{ $t('Close') }}</button>
+
       <!-- Select axis table -->
       <table>
-        <tr>
+        <tr class="table-header">
           <th>{{ $t('Name') }}</th>
           <th>{{ $t('Description') }}</th>
           <th>{{ $t('Options') }}</th>
         </tr>
-        <tr v-for="ax in axesData">
-          <td>{{ ax.name }}</td>
+        <tr v-for="(ax, index) in axesData" :class="[index % 2 == 0 ? 'oddRow' : 'evenRow']">
+          <td class="variable-name-cell">{{ ax.name }}</td>
           <td>{{ ax.description }}</td>
           <td class="options-td">
             <button @click="() => addAxis(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
@@ -24,18 +27,20 @@
 
 
     <!-- Selected axis -->
-    <div class="selected-axis-container">
-      <button v-for="sAx in selectedAxes">{{ sAx.name }}</button>
+    <div class="selected-axis-container" v-show="!isVariablesTableVisible">
+      <button v-for="sAx in selectedAxes">{{ sAx.name }} ({{ sAx.selOption }})</button>
       <button @click="isVariablesTableVisible = true">{{ $t('Visualize more data +') }}</button>
     </div>
-    <div class="options-container">
+
+    <div class="options-container" v-show="!isVariablesTableVisible">
       <button @click="loadPrevious24h">
         <{{ $t('Load previous 24h') }}</button>
     </div>
-    <!-- Temporal status radials -->
-    <div class="graphs-radars-container">
+
+
+    <!-- Chart - Data visualization  -->
+    <div class="graphs-radars-container" v-show="!isVariablesTableVisible">
       <div class="graph-radar-container" v-for="rr in radars">
-        <!-- <div>{{ rr }}</div> -->
         <div class="graph-radar-map-container">
           <div class="graph-container">
             <Chart ref='chart' :antennaID=rr :axesData="selectedAxes" />
@@ -60,6 +65,7 @@
 import TopIcons from './components/TopIcons.vue';
 import Chart from './components/RadialChart.vue';
 import axesDataFile from "./components/RadialChartAxis.js";
+import RadialVariableClass from "./components/RadialVariableClass.js";
 
 export default {
   data() {
@@ -80,10 +86,12 @@ export default {
     },
 
     addAxis(axis, opt) {
-      this.selectedAxes.push(axis);
+      let radarVar = new RadialVariableClass(axis);
+      radarVar.selOption = opt;
+      this.selectedAxes.push(radarVar);
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
-        chartComp.addAxis(axis, opt);
+        chartComp.addAxis(radarVar, opt);
       }
     }
   },
@@ -123,6 +131,36 @@ export default {
   text-transform: none;
   line-height: 35px;
   z-index: 2;
+}
+
+
+.table-container {
+  padding: min(5%, 30px);
+  font-size: small;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+table {
+  border-collapse: collapse;
+  border: none;
+}
+
+.table-header {
+  background: linear-gradient(to right, transparent 0%, rgb(94 173 213) 10%, rgb(94 173 213) 90%, transparent 100%);
+}
+
+
+
+.oddRow {
+  background: linear-gradient(to right, transparent 0%, rgb(205, 239, 255) 10%, rgb(205, 239, 255) 90%, transparent 100%);
+}
+
+.variable-name-cell{
+  font-weight: bold;
+  padding: min(2%, 10px);
 }
 
 .graphs-radars-container {
