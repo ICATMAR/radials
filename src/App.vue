@@ -10,18 +10,20 @@
 
       <!-- Select radar variable table -->
       <table>
-        <tr class="table-header">
-          <th>{{ $t('Name') }}</th>
-          <th>{{ $t('Description') }}</th>
-          <th>{{ $t('Options') }}</th>
-        </tr>
-        <tr v-for="(ax, index) in radarVarsData" :class="[index % 2 == 0 ? 'oddRow' : 'evenRow']">
-          <td class="variable-name-cell">{{ ax.name }}</td>
-          <td>{{ ax.description }}</td>
-          <td class="options-td">
-            <button @click="() => addRadarVar(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
-          </td>
-        </tr>
+        <tbody>
+          <tr class="table-header">
+            <th>{{ $t('Name') }}</th>
+            <th>{{ $t('Description') }}</th>
+            <th>{{ $t('Options') }}</th>
+          </tr>
+          <tr v-for="(ax, index) in radarVarsData" :class="[index % 2 == 0 ? 'oddRow' : 'evenRow']">
+            <td class="variable-name-cell">{{ ax.name }}</td>
+            <td>{{ ax.description }}</td>
+            <td class="options-td">
+              <button @click="() => addRadarVar(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
@@ -158,7 +160,7 @@ table {
   background: linear-gradient(to right, transparent 0%, rgb(205, 239, 255) 10%, rgb(205, 239, 255) 90%, transparent 100%);
 }
 
-.variable-name-cell{
+.variable-name-cell {
   font-weight: bold;
   padding: min(2%, 10px);
 }
