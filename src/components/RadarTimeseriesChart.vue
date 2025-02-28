@@ -324,6 +324,9 @@ export default {
 
 
 
+
+
+
     // Load 24 files more
     load24hMore() {
 
@@ -374,7 +377,36 @@ export default {
         }
       }).catch(e => { throw e });
 
-    }
+    },
+
+
+    // Hide / Show variables
+    setVariableVisible(varIndex, isVisible) {
+      this.chartOptions.series[varIndex].visible = isVisible;
+    },
+
+
+    // Hover
+    // https://www.highcharts.com/forum/viewtopic.php?t=49254
+    // https://jsfiddle.net/BlackLabel/abphd5un/
+    highlightVariable(index) {
+      // Make every series inactive
+      this.chartOptions.series.forEach(series => {
+        debugger;
+        series.setState('inactive');
+      })
+      // Highlight chosen series
+      this.chartOptions.series[index].setState('hover');
+    },
+    // Mouse leave
+    resetVariableHighlights(){
+      this.chartOptions.series.forEach(series => {
+        series.setState('normal');
+      })
+    } 
+
+
+
   },
 };
 </script>
