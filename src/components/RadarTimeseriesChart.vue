@@ -139,16 +139,19 @@ export default {
           }
         },
         legend: {
-          layout: 'vertical',
-          align: 'left',
-          x: 80,
-          verticalAlign: 'top',
-          y: 0,
-          floating: true,
-          backgroundColor:
-            Highcharts.defaultOptions.legend.backgroundColor || // theme
-            'rgba(255,255,255,0.25)'
+          enabled: false
         },
+        // legend: {
+        //   layout: 'vertical',
+        //   align: 'left',
+        //   x: 80,
+        //   verticalAlign: 'top',
+        //   y: 0,
+        //   floating: true,
+        //   backgroundColor:
+        //     Highcharts.defaultOptions.legend.backgroundColor || // theme
+        //     'rgba(255,255,255,0.25)'
+        // },
         series: [
           //   {
           //   // Primary
