@@ -8,7 +8,7 @@
   </Transition>
 
   <div v-show="showNoData" id="no-data-message">
-    <span>{{ $t('No data for the last 24 requested hours') }}</span>
+    <span>{{ $t('No data for the last 24 hours requested') }}</span>
     <button @click="showNoData = false">Close</button>
   </div>
 
@@ -133,6 +133,9 @@ export default {
         plotOptions: {
           dataGrouping: {
             enabled: true
+          },
+          spline: {
+            visible: false // HACK: Fixes issue #3
           }
         },
         legend: {
@@ -280,7 +283,7 @@ export default {
       // yAxis common for same series with different options
       // Find if any series has the same name
       let similarSeries = this.currentRadarVars.filter(ax => ax.name == radarVar.name);
-      if (similarSeries.length > 1){
+      if (similarSeries.length > 1) {
         yAxisRangeIndex = this.currentRadarVars.findIndex(ax => ax.name == radarVar.name);
       }
 
@@ -295,6 +298,8 @@ export default {
           valueSuffix: ' ' + radarVar.units,
         }
       };
+
+
       // RESPONSIVE - responsive
       this.chartOptions.responsive.rules[0].chartOptions.yAxis[currentAxisIndex] = {
         showLastLabel: false,
@@ -305,6 +310,12 @@ export default {
           format: null
         }
       }
+
+      // HACK: Fixes issue #3
+      this.chartOptions.plotOptions.spline = { visible: false };
+      this.$nextTick(() => {
+        this.chartOptions.plotOptions.spline = { visible: true };
+      })
     },
 
 
