@@ -9,7 +9,7 @@ export default [
     calculate: (points, option) => {
       if (points == undefined)
         return 0;
-      if (option == undefined || option == "All"){
+      if (option == undefined || option == "All") {
         return points.length;
       } else if (option == "Only valid") {
         return points.filter(p =>
@@ -18,7 +18,7 @@ export default [
           p["Q203 (flag)"] == 1 &&
           p["Q204 (flag)"] == 1 &&
           p["Q205 (flag)"] == 1 &&
-          p["Q206 (flag)"] == 1 &&
+          (p["Q206 (flag)"] == 1 || p["Q206 (flag)"] == 2) &&
           p["Q207 (flag)"] == 1).length;
       }
     },
@@ -33,12 +33,12 @@ export default [
       "Q201 stands for... Q202 stands for... Q203 stands for... Q204 stands for... Q205 stands for... Q206 stands for... Q207 stands for...",
     units: "flagged points",
     label: "{value}",
-    options: ["All", "Q201", "Q202", "Q203", "Q203", "Q204", "Q205", "Q206", "Q207"],
+    options: ["All", "Q201", "Q202", "Q203", "Q204", "Q205", "Q206", "Q207"],
     calculate: (points, option) => {
       if (points == undefined)
         return 0;
       // Return points flagged by any flag
-      if (option == undefined || option == "All"){
+      if (option == undefined || option == "All") {
         return points.filter(p =>
           p["Q201 (flag)"] != 1 ||
           p["Q202 (flag)"] != 1 ||
@@ -67,7 +67,7 @@ export default [
       if (points == undefined)
         return 0;
       // Calculates the average spatial count
-      if (option == undefined || option == "Average"){
+      if (option == undefined || option == "Average") {
         let sum = points.reduce((acc, point) => acc + (point["Spatial Count"] || 0), 0);
         return sum / points.length;
       } else if (option == "Maximum") {
@@ -92,7 +92,7 @@ export default [
       if (points == undefined)
         return 0;
       // Calculates the average spatial count
-      if (option == undefined || option == "Average"){
+      if (option == undefined || option == "Average") {
         let sum = points.reduce((acc, point) => acc + (point["Temporal Count"] || 0), 0);
         return sum / points.length;
       } else if (option == "Maximum") {
@@ -119,7 +119,7 @@ export default [
       if (points == undefined)
         return 0;
       // Calculates the average spatial quality
-      if (option == undefined || option == "Average"){
+      if (option == undefined || option == "Average") {
         let sum = points.reduce((acc, point) => acc + (point["Spatial Quality"] || 0), 0);
         return sum / points.length;
       } else if (option == "Maximum") {
@@ -133,21 +133,26 @@ export default [
   // Temporal Quality
   {
     name: "Temporal Quality",
-    description: "Average / maximum / minimum of the temporal quality of the points.",
+    description: "Average / maximum / minimum / standard deviation of the temporal quality of the points.",
     units: "temporal quality",
     label: "{value}",
-    options: ["Average", "Maximum", "Minimum"],
+    options: ["Average", "Maximum", "Minimum", "STD"],
     calculate: (points, option) => {
-      if (points == undefined)
-        return 0;
-      // Calculates the average temporal quality
-      if (option == undefined || option == "Average"){
-        let sum = points.reduce((acc, point) => acc + (point["Temporal Quality"] || 0), 0);
-        return sum / points.length;
-      } else if (option == "Maximum") {
-        return Math.max(...points.map(point => point["Temporal Quality"] || 0));
-      } else if (option == "Minimum")
-        return Math.min(...points.map(point => point["Temporal Quality"] || 0));
+      if (!points || points.length === 0) return 0;
+      
+      let values = points.map(point => point["Temporal Quality"] || 0);
+
+      if (option === undefined || option === "Average") {
+        return values.reduce((acc, val) => acc + val, 0) / values.length;
+      } else if (option === "Maximum") {
+        return Math.max(...values);
+      } else if (option === "Minimum") {
+        return Math.min(...values);
+      } else if (option === "STD") {
+        let mean = values.reduce((acc, val) => acc + val, 0) / values.length;
+        let variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
+        return Math.sqrt(variance);
+      }
     },
     type: "spline", // "spline", "column", "line", "bar"
   },
@@ -167,7 +172,7 @@ export default [
       if (points == undefined)
         return 0;
       // Calculates 
-      if (option == undefined || option == "Average"){
+      if (option == undefined || option == "Average") {
         let sum = points.reduce((acc, point) => acc + (point["SNR (dB)"] || 0), 0);
         return sum / points.length;
       } else if (option == "Maximum") {
@@ -177,6 +182,6 @@ export default [
     },
     type: "spline", // "spline", "column", "line", "bar"
   },
-  
+
 
 ];
