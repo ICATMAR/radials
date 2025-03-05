@@ -10,25 +10,29 @@
 
       <!-- Select radar variable table -->
       <table>
-        <tr class="table-header">
-          <th>{{ $t('Name') }}</th>
-          <th>{{ $t('Description') }}</th>
-          <th>{{ $t('Options') }}</th>
-        </tr>
-        <tr v-for="(ax, index) in radarVarsData" :class="[index % 2 == 0 ? 'oddRow' : 'evenRow']">
-          <td class="variable-name-cell">{{ ax.name }}</td>
-          <td>{{ ax.description }}</td>
-          <td class="options-td">
-            <button @click="() => addRadarVar(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
-          </td>
-        </tr>
+        <tbody>
+          <tr class="table-header">
+            <th>{{ $t('Name') }}</th>
+            <th>{{ $t('Description') }}</th>
+            <th>{{ $t('Options') }}</th>
+          </tr>
+          <tr v-for="(ax, index) in radarVarsData" :class="[index % 2 == 0 ? 'oddRow' : 'evenRow']">
+            <td class="variable-name-cell">{{ ax.name }}</td>
+            <td>{{ ax.description }}</td>
+            <td class="options-td">
+              <button @click="() => addRadarVar(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
 
     <!-- Selected radar variable -->
     <div class="selected-variable-container" v-show="!isVariablesTableVisible">
-      <button v-for="sAx in selectedAxes">{{ sAx.name }} ({{ sAx.selOption }})</button>
+      <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
+        @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">{{ sRV.name }} ({{ sRV.selOption
+        }})</button>
       <button @click="isVariablesTableVisible = true">{{ $t('Visualize more data +') }}</button>
     </div>
 
@@ -43,7 +47,7 @@
       <div class="graph-radar-container" v-for="rr in radars">
         <div class="graph-radar-map-container">
           <div class="graph-container">
-            <Chart ref='chart' :antennaID=rr :radarVarsData="selectedAxes" />
+            <Chart ref='chart' :antennaID=rr :radarVarsData="selectedVars" />
           </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
@@ -72,7 +76,8 @@ export default {
     return {
       radars: ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'],
       radarVarsData: radarVarsDataFile,
-      selectedAxes: [radarVarsDataFile[0]],
+      selectedVars: [radarVarsDataFile[0]],
+      selectedVarsVisibility: [true],
       isVariablesTableVisible: false,
     }
 
@@ -88,11 +93,40 @@ export default {
     addRadarVar(radarVarIn, opt) {
       let radarVar = new RadarVariableClass(radarVarIn);
       radarVar.selOption = opt;
-      this.selectedAxes.push(radarVar);
+      this.selectedVars.push(radarVar);
+      this.selectedVarsVisibility.push(true);
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
         chartComp.addRadarVar(radarVar, opt);
       }
+    },
+
+    changeVarVisibility(index) {
+      // Change the visibility of that variable
+      this.selectedVarsVisibility[index] = !this.selectedVarsVisibility[index];
+      // Apply to existing charts
+      for (let i = 0; i < this.radars.length; i++) {
+        let chartComp = this.$refs.chart[i];
+        chartComp.setVariableVisible(index, this.selectedVarsVisibility[index]);
+      }
+    },
+
+    onHoverOnVariable(index) {
+      // Apply to existing charts
+      if (this.selectedVarsVisibility[index]) {
+        for (let i = 0; i < this.radars.length; i++) {
+          let chartComp = this.$refs.chart[i];
+          chartComp.highlightVariable(index);
+        }
+      }
+    },
+    onMouseLeaveVariable() {
+      // Apply to existing charts
+      for (let i = 0; i < this.radars.length; i++) {
+        let chartComp = this.$refs.chart[i];
+        chartComp.resetVariableHighlights();
+      }
+
     }
   },
   components: {
@@ -158,7 +192,7 @@ table {
   background: linear-gradient(to right, transparent 0%, rgb(205, 239, 255) 10%, rgb(205, 239, 255) 90%, transparent 100%);
 }
 
-.variable-name-cell{
+.variable-name-cell {
   font-weight: bold;
   padding: min(2%, 10px);
 }

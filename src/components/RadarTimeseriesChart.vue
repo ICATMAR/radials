@@ -8,7 +8,7 @@
   </Transition>
 
   <div v-show="showNoData" id="no-data-message">
-    <span>{{ $t('No data for the last 24 requested hours') }}</span>
+    <span>{{ $t('No data for the last 24 hours requested') }}</span>
     <button @click="showNoData = false">Close</button>
   </div>
 
@@ -133,19 +133,25 @@ export default {
         plotOptions: {
           dataGrouping: {
             enabled: true
+          },
+          spline: {
+            visible: false // HACK: Fixes issue #3
           }
         },
         legend: {
-          layout: 'vertical',
-          align: 'left',
-          x: 80,
-          verticalAlign: 'top',
-          y: 0,
-          floating: true,
-          backgroundColor:
-            Highcharts.defaultOptions.legend.backgroundColor || // theme
-            'rgba(255,255,255,0.25)'
+          enabled: false
         },
+        // legend: {
+        //   layout: 'vertical',
+        //   align: 'left',
+        //   x: 80,
+        //   verticalAlign: 'top',
+        //   y: 0,
+        //   floating: true,
+        //   backgroundColor:
+        //     Highcharts.defaultOptions.legend.backgroundColor || // theme
+        //     'rgba(255,255,255,0.25)'
+        // },
         series: [
           //   {
           //   // Primary
@@ -280,7 +286,7 @@ export default {
       // yAxis common for same series with different options
       // Find if any series has the same name
       let similarSeries = this.currentRadarVars.filter(ax => ax.name == radarVar.name);
-      if (similarSeries.length > 1){
+      if (similarSeries.length > 1) {
         yAxisRangeIndex = this.currentRadarVars.findIndex(ax => ax.name == radarVar.name);
       }
 
@@ -295,6 +301,8 @@ export default {
           valueSuffix: ' ' + radarVar.units,
         }
       };
+
+
       // RESPONSIVE - responsive
       this.chartOptions.responsive.rules[0].chartOptions.yAxis[currentAxisIndex] = {
         showLastLabel: false,
@@ -305,7 +313,16 @@ export default {
           format: null
         }
       }
+
+      // HACK: Fixes issue #3
+      this.chartOptions.plotOptions.spline = { visible: false };
+      this.$nextTick(() => {
+        this.chartOptions.plotOptions.spline = { visible: true };
+      })
     },
+
+
+
 
 
 
@@ -360,7 +377,36 @@ export default {
         }
       }).catch(e => { throw e });
 
-    }
+    },
+
+
+    // Hide / Show variables
+    setVariableVisible(varIndex, isVisible) {
+      this.chartOptions.series[varIndex].visible = isVisible;
+    },
+
+
+    // Hover
+    // https://www.highcharts.com/forum/viewtopic.php?t=49254
+    // https://jsfiddle.net/BlackLabel/abphd5un/
+    highlightVariable(index) {
+      // Make every series inactive
+      this.chartOptions.series.forEach(series => {
+        debugger;
+        series.setState('inactive');
+      })
+      // Highlight chosen series
+      this.chartOptions.series[index].setState('hover');
+    },
+    // Mouse leave
+    resetVariableHighlights(){
+      this.chartOptions.series.forEach(series => {
+        series.setState('normal');
+      })
+    } 
+
+
+
   },
 };
 </script>
