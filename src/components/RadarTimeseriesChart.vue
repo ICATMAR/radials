@@ -134,6 +134,9 @@ export default {
           dataGrouping: {
             enabled: true
           },
+          column: {
+            pointWidth: 10,
+          }
         },
         legend: {
           enabled: false
