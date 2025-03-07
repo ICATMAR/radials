@@ -40,28 +40,23 @@
     <!-- MAIN CONTENT WITH CHARTS -->
 
     <!-- VARIABLES AND OPTIONS -->
-    <div>
+    <div class="variables-options-container">
 
 
-      <!-- More variables button -->
+      <!-- More variables button and load 24h more -->
       <div class="options-container" v-show="!isVariablesTableVisible">
+        <button @click="loadPrevious24h"><< {{ $t('Load 24h more') }}</button>
         <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
-      </div>
-
-      <!-- Load 24h more-->
-      <div class="options-container" v-show="!isVariablesTableVisible">
-        <button @click="loadPrevious24h">
-          << {{ $t('Load 24h more') }}</button>
       </div>
 
       <div class="selected-variable-container" v-show="!isVariablesTableVisible">
         <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
-          :class="[selectedVarsVisibility[index] ? 'button-variable' : 'button-inactive']"
-          class="clickable"
+          :class="[selectedVarsVisibility[index] ? 'button-variable' : 'button-inactive']" class="clickable"
           @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">
           {{ sRV.name }} ({{ sRV.selOption
           }})
           <div class="highchartsLegendCircleColor" :style="{ background: highchartsColors[index] }"></div>
+          <div class="remove-variable clickable">✕</div>
         </button>
       </div>
     </div>
@@ -204,9 +199,31 @@ export default {
   z-index: 2;
 }
 
+.variables-options-container {
+  box-shadow: 0 0 4px black;
+}
 
 .button-variable {
   background: var(--blue)
+}
+
+.remove-variable {
+  background: var(--red);
+
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  margin-left: 5px;
+
+  border-radius: 50%;
+  box-shadow: 0 0 4px black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  pointer-events: all;
+  cursor: pointer;
 }
 
 
@@ -263,6 +280,7 @@ table {
 .graphs-radars-container {
   overflow-y: auto;
   height: -webkit-fill-available;
+  z-index: -1;
 }
 
 .graph-radar-container {
