@@ -11,7 +11,7 @@ export default [
         return 0;
       if (option == undefined || option == "All") {
         return points.length;
-      } else if (option == "Only valid") {
+      } else if (option == "Only valid points") {
         return points.filter(p =>
           p["Q201 (flag)"] == 1 &&
           p["Q202 (flag)"] == 1 &&
