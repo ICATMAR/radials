@@ -153,6 +153,10 @@ button:hover {
   background-color: var(--red);
 }
 
+.button-inactive {
+  background-color: rgb(136 176 191);
+}
+
 @media screen and (max-width: 770px) {
   button {
     padding: 4px;

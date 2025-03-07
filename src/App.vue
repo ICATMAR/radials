@@ -30,7 +30,7 @@
 
     <!-- Selected radar variable -->
     <div class="selected-variable-container" v-show="!isVariablesTableVisible">
-      <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
+      <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)" :class="[selectedVarsVisibility[index] ? '' : 'button-inactive']"
         @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">{{ sRV.name }} ({{ sRV.selOption
         }})</button>
       <button @click="isVariablesTableVisible = true">{{ $t('Visualize more data +') }}</button>

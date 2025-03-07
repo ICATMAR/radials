@@ -222,7 +222,12 @@ export default {
                 // }, {
                 //   visible: false
                 // }
-              ]
+              ],
+              plotOptions: {
+                column: {
+                  pointWidth: 5,
+                }
+              },
             }
           }]
         }
@@ -290,6 +295,9 @@ export default {
         yAxisRangeIndex = this.currentRadarVars.findIndex(ax => ax.name == radarVar.name);
       }
 
+      let prevVisible = true;
+      if (this.chartOptions.series[currentAxisIndex]) prevVisible = this.chartOptions.series[currentAxisIndex].visible;
+
       this.chartOptions.series[currentAxisIndex] = ({
         name: radarVar.name + ' (' + radarVar.selOption + ')',
         type: radarVar.type,
@@ -300,7 +308,7 @@ export default {
         tooltip: {
           valueSuffix: ' ' + radarVar.units,
         },
-        visible: true,
+        visible: prevVisible,
         // HACK: missing functions for series when using chart options
         setState: function (state) {
           if (state == 'inactive') {
