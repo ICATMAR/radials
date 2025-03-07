@@ -30,15 +30,24 @@
 
     <!-- Selected radar variable -->
     <div class="selected-variable-container" v-show="!isVariablesTableVisible">
-      <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)" :class="[selectedVarsVisibility[index] ? '' : 'button-inactive']"
-        @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">{{ sRV.name }} ({{ sRV.selOption
-        }})</button>
-      <button @click="isVariablesTableVisible = true">{{ $t('Visualize more data +') }}</button>
+      <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
+        :class="[selectedVarsVisibility[index] ? '' : 'button-inactive']" @mouseenter="onHoverOnVariable(index)"
+        @mouseleave="onMouseLeaveVariable()">
+        {{ sRV.name }} ({{ sRV.selOption
+        }})
+        <div class="highchartsLegendCircleColor" :style="{ background: highchartsColors[index] }"></div>
+      </button>
     </div>
 
+    <!-- More variables button -->
+    <div class="options-container" v-show="!isVariablesTableVisible">
+      <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
+    </div>
+
+    <!-- Load 24h more-->
     <div class="options-container" v-show="!isVariablesTableVisible">
       <button @click="loadPrevious24h">
-        <{{ $t('Load previous 24h') }}</button>
+        <{{ $t('Load 24h more') }}</button>
     </div>
 
 
@@ -49,7 +58,7 @@
           <div class="graph-container">
             <Chart ref='chart' :antennaID=rr :antennaFullName=radarFullNames[index] :radarVarsData="selectedVars" />
           </div>
-          <div class="map-container">Explore in interactive map</div>
+          <!-- <div class="map-container">Explore in interactive map</div> -->
         </div>
       </div>
     </div>
@@ -71,7 +80,15 @@ import Chart from './components/RadarTimeseriesChart.vue';
 import radarVarsDataFile from "./components/RadarVariableDefinitions.js";
 import RadarVariableClass from "./components/RadarVariableClass.js";
 
+// Graph colors
+import Highcharts from 'highcharts';
+
 export default {
+  mounted() {
+    for (let i = 0; i < 30; i++) {
+      this.highchartsColors[i] = Highcharts.getOptions().colors[i];
+    }
+  },
   data() {
     return {
       radars: ["CREU", "BEGU", "AREN", "PBCN", "GNST"],
@@ -79,6 +96,7 @@ export default {
       radarVarsData: radarVarsDataFile,
       selectedVars: [radarVarsDataFile[0]],
       selectedVarsVisibility: [true],
+      highchartsColors: [],
       isVariablesTableVisible: false,
     }
 
@@ -169,6 +187,26 @@ export default {
 }
 
 
+
+.options-container {
+  display: flex;
+  justify-content: center;
+  padding: 5px;
+}
+
+
+.highchartsLegendCircleColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 10px;
+  border: solid 1px white;
+  box-shadow: 0 0 4px black;
+  pointer-events: none;
+}
+
+
+
 .table-container {
   padding: min(5%, 30px);
   font-size: small;
@@ -256,7 +294,9 @@ table {
 
 .selected-variable-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  padding: 5px;
 }
 
 /* .img-radar-container {
@@ -282,6 +322,8 @@ table {
 @media screen and (max-width: 770px) {
   .title {
     font-size: 20px;
+    padding-top: 30px;
+    padding-bottom: 10px;
   }
 
   .graph-radar-map-container {
@@ -290,6 +332,14 @@ table {
 
   .graph-container {
     width: 95%;
+  }
+
+  .options-container {
+    padding: 0px;
+  }
+
+  .selected-variable-container {
+    padding: 0px;
   }
 }
 </style>
