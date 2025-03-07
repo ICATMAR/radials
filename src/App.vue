@@ -2,12 +2,13 @@
   <TopIcons></TopIcons>
   <!-- Page container -->
   <div class="main-container">
-    <!-- Radials title -->
-    <div class="title">{{ $t('HF Radars network status') }}</div>
-    <div class="table-container" @click="isVariablesTableVisible = false" v-show="isVariablesTableVisible">
-      <!-- Close -->
-      <button @click="isVariablesTableVisible = false">{{ $t('Close') }}</button>
 
+
+    <!-- RADIALS TITLE -->
+    <div class="title">{{ $t('HF Radars network status') }}</div>
+
+    <!-- TABLE -->
+    <div class="table-container" @click="isVariablesTableVisible = false" v-show="isVariablesTableVisible">
       <!-- Select radar variable table -->
       <table>
         <tbody>
@@ -20,37 +21,52 @@
             <td class="variable-name-cell">{{ ax.name }}</td>
             <td>{{ ax.description }}</td>
             <td class="options-td">
-              <button @click="() => addRadarVar(ax, opt)" v-for="opt in ax.options">{{ opt }}</button>
+              <button @click="() => { isVariablesTableVisible = false; addRadarVar(ax, opt) }"
+                v-for="opt in ax.options">{{ opt }}</button>
             </td>
           </tr>
         </tbody>
       </table>
+
+
+      <!-- Close table -->
+      <button @click="isVariablesTableVisible = false" style="margin:20px">{{ $t('Close') }}</button>
     </div>
 
 
-    <!-- Selected radar variable -->
-    <div class="selected-variable-container" v-show="!isVariablesTableVisible">
-      <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
-        :class="[selectedVarsVisibility[index] ? '' : 'button-inactive']" @mouseenter="onHoverOnVariable(index)"
-        @mouseleave="onMouseLeaveVariable()">
-        {{ sRV.name }} ({{ sRV.selOption
-        }})
-        <div class="highchartsLegendCircleColor" :style="{ background: highchartsColors[index] }"></div>
-      </button>
+
+
+
+    <!-- MAIN CONTENT WITH CHARTS -->
+
+    <!-- VARIABLES AND OPTIONS -->
+    <div>
+
+
+      <!-- More variables button -->
+      <div class="options-container" v-show="!isVariablesTableVisible">
+        <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
+      </div>
+
+      <!-- Load 24h more-->
+      <div class="options-container" v-show="!isVariablesTableVisible">
+        <button @click="loadPrevious24h">
+          << {{ $t('Load 24h more') }}</button>
+      </div>
+
+      <div class="selected-variable-container" v-show="!isVariablesTableVisible">
+        <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
+          :class="[selectedVarsVisibility[index] ? 'button-variable' : 'button-inactive']"
+          class="clickable"
+          @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">
+          {{ sRV.name }} ({{ sRV.selOption
+          }})
+          <div class="highchartsLegendCircleColor" :style="{ background: highchartsColors[index] }"></div>
+        </button>
+      </div>
     </div>
 
-    <!-- More variables button -->
-    <div class="options-container" v-show="!isVariablesTableVisible">
-      <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
-    </div>
-
-    <!-- Load 24h more-->
-    <div class="options-container" v-show="!isVariablesTableVisible">
-      <button @click="loadPrevious24h">
-        <{{ $t('Load 24h more') }}</button>
-    </div>
-
-
+    <!-- CHARTS -->
     <!-- Chart - Data visualization  -->
     <div class="graphs-radars-container" v-show="!isVariablesTableVisible">
       <div class="graph-radar-container" v-for="(rr, index) in radars">
@@ -63,6 +79,8 @@
       </div>
     </div>
 
+
+    <!-- BOTTOM -->
     <!-- Bottom images of radars -->
     <div class="imgs-radars-container">
       <!-- <div v-for="rr in radars" class="img-radar-container">
@@ -187,6 +205,10 @@ export default {
 }
 
 
+.button-variable {
+  background: var(--blue)
+}
+
 
 .options-container {
   display: flex;
@@ -214,6 +236,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  overflow: overlay;
 }
 
 table {
