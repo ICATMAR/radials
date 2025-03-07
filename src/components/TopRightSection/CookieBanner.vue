@@ -37,7 +37,7 @@
 export default {
   name: "CookieBanner",
   mounted() {
-    this.isVisible = true;
+    this.isVisible = false;
     // If cookies are set, hide banner
     if (localStorage.getItem('cookie-analytics')) {
       let paramsStr = localStorage.getItem('cookie-analytics');
