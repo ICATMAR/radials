@@ -134,9 +134,6 @@ export default {
           dataGrouping: {
             enabled: true
           },
-          spline: {
-            visible: false // HACK: Fixes issue #3
-          }
         },
         legend: {
           enabled: false
@@ -290,8 +287,8 @@ export default {
         yAxisRangeIndex = this.currentRadarVars.findIndex(ax => ax.name == radarVar.name);
       }
 
-      this.chartOptions.series[currentAxisIndex] = {
-        name: radarVar.name,
+      this.chartOptions.series[currentAxisIndex] = ({
+        name: radarVar.name + ' (' + radarVar.selOption + ')',
         type: radarVar.type,
         yAxis: isPointsAxis ? this.numPointsAxisIndex : yAxisRangeIndex,
         data: data,
@@ -299,8 +296,23 @@ export default {
         //dashStyle: 'shortdot',
         tooltip: {
           valueSuffix: ' ' + radarVar.units,
-        }
-      };
+        },
+        visible: true,
+        // HACK: missing functions for series when using chart options
+        setState: function (state) {
+          if (state == 'inactive') {
+            this.opacity = 0.5;
+            this.lineWidth = 1;
+          } else if (state == 'hover') {
+            this.opacity = 1.0;
+            this.lineWidth = 4;
+          } else if (state == 'normal') {
+            this.opacity = 1.0;
+            this.lineWidth = 2;
+          }
+        },
+
+      });
 
 
       // RESPONSIVE - responsive
@@ -314,10 +326,11 @@ export default {
         }
       }
 
-      // HACK: Fixes issue #3
-      this.chartOptions.plotOptions.spline = { visible: false };
+
+      // HACK: fix discontinuity in lines (issue #3)
+      this.chartOptions.series[currentAxisIndex].visible = !this.chartOptions.series[currentAxisIndex].visible;
       this.$nextTick(() => {
-        this.chartOptions.plotOptions.spline = { visible: true };
+        this.chartOptions.series[currentAxisIndex].visible = !this.chartOptions.series[currentAxisIndex].visible;
       })
     },
 
@@ -392,18 +405,17 @@ export default {
     highlightVariable(index) {
       // Make every series inactive
       this.chartOptions.series.forEach(series => {
-        debugger;
         series.setState('inactive');
       })
       // Highlight chosen series
       this.chartOptions.series[index].setState('hover');
     },
     // Mouse leave
-    resetVariableHighlights(){
+    resetVariableHighlights() {
       this.chartOptions.series.forEach(series => {
         series.setState('normal');
       })
-    } 
+    }
 
 
 
