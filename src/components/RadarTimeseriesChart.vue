@@ -82,54 +82,7 @@ export default {
           ordinal: false,
           crosshair: true
         }],
-        yAxis: [
-          //   { // Default yAxis
-          //   title: {
-          //     text: this.radarVarsData[0].name,
-          //     style: {
-          //       color: Highcharts.getOptions().colors[0]
-          //     }
-          //   },
-          //   labels: {
-          //     format: this.radarVarsData[0].label,
-          //     style: {
-          //       color: Highcharts.getOptions().colors[0]
-          //     }
-          //   },
-          //   opposite: true
-          // },
-          // { // Secondary yAxis
-          //   gridLineWidth: 0,
-          //   title: {
-          //     text: 'Flagged points',
-          //     style: {
-          //       color: Highcharts.getOptions().colors[2]
-          //     }
-          //   },
-          //   labels: {
-          //     format: '{value} flagged points',
-          //     style: {
-          //       color: Highcharts.getOptions().colors[2]
-          //     }
-          //   }
-
-          // }, { // Tertiary yAxis
-          //   gridLineWidth: 0,
-          //   title: {
-          //     text: 'Max. velocity',
-          //     style: {
-          //       color: Highcharts.getOptions().colors[1]
-          //     }
-          //   },
-          //   labels: {
-          //     format: '{value} cm/s',
-          //     style: {
-          //       color: Highcharts.getOptions().colors[1]
-          //     }
-          //   },
-          //   opposite: true
-          // }
-        ],
+        yAxis: [],
         tooltip: {
           shared: true,
           xDateFormat: '%Y-%m-%d %Hh',
@@ -145,54 +98,7 @@ export default {
         legend: {
           enabled: false
         },
-        // legend: {
-        //   layout: 'vertical',
-        //   align: 'left',
-        //   x: 80,
-        //   verticalAlign: 'top',
-        //   y: 0,
-        //   floating: true,
-        //   backgroundColor:
-        //     Highcharts.defaultOptions.legend.backgroundColor || // theme
-        //     'rgba(255,255,255,0.25)'
-        // },
-        series: [
-          //   {
-          //   // Primary
-          //   name: this.radarVarsData[0].name,
-          //   type: this.radarVarsData[0].type,
-          //   yAxis: 0,
-          //   data: [],
-          //   tooltip: {
-          //     valueSuffix: ' ' + this.radarVarsData[0].units,
-          //   }
-          // },
-          // Secondary
-          // {
-          //   name: 'Flagged points',
-          //   type: 'spline',
-          //   yAxis: 1,
-          //   data: [],
-          //   marker: {
-          //     enabled: false
-          //   },
-          //   dashStyle: 'shortdot',
-          //   tooltip: {
-          //     valueSuffix: ' points'
-          //   }
-
-          // },
-          // // Tertiary
-          // {
-          //   name: 'Max. velocity',
-          //   type: 'spline',
-          //   yAxis: 2,
-          //   data: [],
-          //   tooltip: {
-          //     valueSuffix: ' cm/s'
-          //   }
-          // }
-        ],
+        series: [],
         responsive: {
           rules: [{
             condition: {
@@ -207,26 +113,7 @@ export default {
                 x: 0,
                 y: 0
               },
-              yAxis: [
-                //   {
-                //   labels: {
-                //     align: 'right',
-                //     x: 0,
-                //     y: -6
-                //   },
-                //   showLastLabel: false
-                // },
-                // {
-                //   labels: {
-                //     align: 'left',
-                //     x: 0,
-                //     y: -6
-                //   },
-                //   showLastLabel: false
-                // }, {
-                //   visible: false
-                // }
-              ],
+              yAxis: [],
               plotOptions: {
                 column: {
                   pointWidth: 5,
