@@ -45,8 +45,9 @@
 
       <!-- More variables button and load 24h more -->
       <div class="options-container" v-show="!isVariablesTableVisible">
-        <button @click="loadPrevious24h"><< {{ $t('Load 24h more') }}</button>
-        <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
+        <button @click="loadPrevious24h">
+          << {{ $t('Load 24h more') }}</button>
+            <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
       </div>
 
       <div class="selected-variable-container" v-show="!isVariablesTableVisible">
@@ -56,7 +57,7 @@
           {{ sRV.name }} ({{ sRV.selOption
           }})
           <div class="highchartsLegendCircleColor" :style="{ background: highchartsColors[index] }"></div>
-          <div class="remove-variable clickable">✕</div>
+          <div class="remove-variable clickable" @click="removeVariable($event, index)">✕</div>
         </button>
       </div>
     </div>
@@ -159,6 +160,21 @@ export default {
         chartComp.resetVariableHighlights();
       }
 
+    },
+
+    // Remove variable
+    removeVariable(event, index) {
+      event.preventDefault();
+      event.stopPropagation();
+      // Remove data
+      this.selectedVars.splice(index, 1);
+      this.selectedVarsVisibility.splice(index, 1);
+
+      // Apply to existing charts
+      for (let i = 0; i < this.radars.length; i++) {
+        let chartComp = this.$refs.chart[i];
+        chartComp.removeVariable(index);
+      }
     }
   },
   components: {

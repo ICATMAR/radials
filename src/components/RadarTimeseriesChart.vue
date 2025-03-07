@@ -13,7 +13,7 @@
   </div>
 
   <!-- High charts -->
-  <highcharts id="chart" :options="chartOptions"></highcharts>
+  <highcharts ref="chart" id="chart" :options="chartOptions"></highcharts>
 
 </template>
 
@@ -187,7 +187,14 @@ export default {
       }
 
       let prevVisible = true;
-      if (this.chartOptions.series[currentAxisIndex]) prevVisible = this.chartOptions.series[currentAxisIndex].visible;
+      if (this.chartOptions.series[currentAxisIndex]) {
+        // But it if was removed, make it visible
+        if (this.chartOptions.series[currentAxisIndex].wasDeleted) prevVisible = true;
+        // Otherwise use current visible state
+        else
+          prevVisible = this.chartOptions.series[currentAxisIndex].visible
+      };
+
 
       this.chartOptions.series[currentAxisIndex] = ({
         name: radarVar.name + ' (' + radarVar.selOption + ')',
@@ -200,20 +207,6 @@ export default {
           valueSuffix: ' ' + radarVar.units,
         },
         visible: prevVisible,
-        // HACK: missing functions for series when using chart options
-        setState: function (state) {
-          if (state == 'inactive') {
-            this.opacity = 0.5;
-            this.lineWidth = 1;
-          } else if (state == 'hover') {
-            this.opacity = 1.0;
-            this.lineWidth = 4;
-          } else if (state == 'normal') {
-            this.opacity = 1.0;
-            this.lineWidth = 2;
-          }
-        },
-
       });
 
 
@@ -244,10 +237,37 @@ export default {
       this.$nextTick(() => {
         this.chartOptions.series[currentAxisIndex].visible = !this.chartOptions.series[currentAxisIndex].visible;
       });
+
+
+      this.$refs.chart
     },
 
 
+    // Remove variable
+    removeVariable(index) {
+      // Reset highlights
+      this.resetVariableHighlights();
+      this.chartOptions.series.splice(index, 1);
+      this.currentRadarVars.splice(index, 1);
+      this.$refs.chart.chart.series[index].remove()
+      this.$nextTick(() => {
+        //this.$refs.chart.chart.redraw();
+      })
+      return;
 
+      // Hide variable
+      this.setVariableVisible(index, false);
+      // Remove series
+      this.chartOptions.series[index].wasDeleted = true;
+      // Update graph
+      this.$nextTick(() => {
+        let tempRadarVar = this.currentRadarVars.filter((el, i) => i != index);
+        this.currentRadarVars = [];
+        for (let i = 0; i < tempRadarVar.length; i++) {
+          this.addRadarVar(tempRadarVar[i], tempRadarVar[i].selOption);
+        }
+      })
+    },
 
 
 
@@ -316,17 +336,17 @@ export default {
     // https://jsfiddle.net/BlackLabel/abphd5un/
     highlightVariable(index) {
       // Make every series inactive
-      this.chartOptions.series.forEach(series => {
+      this.$refs.chart.chart.series.forEach(series => {
         series.setState('inactive');
       })
       // Highlight chosen series
-      this.chartOptions.series[index].setState('hover');
+      this.$refs.chart.chart.series[index].setState('hover');
     },
     // Mouse leave
     resetVariableHighlights() {
-      this.chartOptions.series.forEach(series => {
+      this.$refs.chart.chart.series.forEach(series => {
         series.setState('normal');
-      })
+      });
     }
 
 
