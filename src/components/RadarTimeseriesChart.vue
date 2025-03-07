@@ -32,6 +32,10 @@ export default {
       type: String,
       required: true
     },
+    antennaFullName: {
+      type: String,
+      required: true
+    },
     radarVarsData: {
       type: Object,
       required: true,
@@ -326,6 +330,16 @@ export default {
       });
 
 
+
+
+      // SUBTITLE
+      let radarData = window.DataManager.HFRadars[this.antennaID];
+      if (radarData == undefined) { debugger; }
+      let coords = radarData.Origin.split(' ').filter(el => el.length != 0);
+      this.chartOptions.subtitle.text = this.antennaFullName + ' (long: ' + parseFloat(coords[1]).toFixed(2) + ', lat: ' + parseFloat(coords[0]).toFixed(2) + ')';
+
+
+
       // RESPONSIVE - responsive
       this.chartOptions.responsive.rules[0].chartOptions.yAxis[currentAxisIndex] = {
         showLastLabel: false,
@@ -342,7 +356,7 @@ export default {
       this.chartOptions.series[currentAxisIndex].visible = !this.chartOptions.series[currentAxisIndex].visible;
       this.$nextTick(() => {
         this.chartOptions.series[currentAxisIndex].visible = !this.chartOptions.series[currentAxisIndex].visible;
-      })
+      });
     },
 
 

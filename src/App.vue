@@ -44,10 +44,10 @@
 
     <!-- Chart - Data visualization  -->
     <div class="graphs-radars-container" v-show="!isVariablesTableVisible">
-      <div class="graph-radar-container" v-for="rr in radars">
+      <div class="graph-radar-container" v-for="(rr, index) in radars">
         <div class="graph-radar-map-container">
           <div class="graph-container">
-            <Chart ref='chart' :antennaID=rr :radarVarsData="selectedVars" />
+            <Chart ref='chart' :antennaID=rr :antennaFullName=radarFullNames[index] :radarVarsData="selectedVars" />
           </div>
           <div class="map-container">Explore in interactive map</div>
         </div>
@@ -74,7 +74,8 @@ import RadarVariableClass from "./components/RadarVariableClass.js";
 export default {
   data() {
     return {
-      radars: ['CREU', 'BEGU', 'AREN', 'PBCN', 'GNST'],
+      radars: ["CREU", "BEGU", "AREN", "PBCN", "GNST"],
+      radarFullNames: ["Cap de Creus", "Cap de Begur", "Port d'Arenys de Mar", "Port de Barcelona", "Port Ginesta"],
       radarVarsData: radarVarsDataFile,
       selectedVars: [radarVarsDataFile[0]],
       selectedVarsVisibility: [true],
