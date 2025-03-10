@@ -333,7 +333,6 @@ table {
 .graph-container {
   width: 80%;
   height: 220px;
-  background-color: var(--lightBlue);
   position: relative;
 }
 
