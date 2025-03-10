@@ -52,10 +52,9 @@
 
       <div class="selected-variable-container" v-show="!isVariablesTableVisible">
         <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
-          :class="[selectedVarsVisibility[index] ? 'button-variable' : 'button-inactive']" class="clickable"
+          :class="{'button-variable': selectedVarsState[index]=='visible', 'button-inactive': selectedVarsState[index]=='inactive', 'hidden': selectedVarsState[index]=='removed'}" class="clickable"
           @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">
-          {{ sRV.name }} ({{ sRV.selOption
-          }})
+          {{ sRV.name }} ({{ sRV.selOption }})
           <div class="highchartsLegendCircleColor" :style="{ background: highchartsColors[index] }"></div>
           <div class="remove-variable clickable" @click="removeVariable($event, index)">✕</div>
         </button>
@@ -109,7 +108,7 @@ export default {
       radarFullNames: ["Cap de Creus", "Cap de Begur", "Port d'Arenys de Mar", "Port de Barcelona", "Port Ginesta"],
       radarVarsData: radarVarsDataFile,
       selectedVars: [radarVarsDataFile[0]],
-      selectedVarsVisibility: [true],
+      selectedVarsState: ["visible"], // visible, inactive, removed
       highchartsColors: [],
       isVariablesTableVisible: false,
     }
@@ -127,7 +126,7 @@ export default {
       let radarVar = new RadarVariableClass(radarVarIn);
       radarVar.selOption = opt;
       this.selectedVars.push(radarVar);
-      this.selectedVarsVisibility.push(true);
+      this.selectedVarsState.push("visible");
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
         chartComp.addRadarVar(radarVar, opt);
@@ -136,17 +135,18 @@ export default {
 
     changeVarVisibility(index) {
       // Change the visibility of that variable
-      this.selectedVarsVisibility[index] = !this.selectedVarsVisibility[index];
+      let state = this.selectedVarsState[index];
+      this.selectedVarsState[index] = state == "visible" ? "inactive" : state != "removed" ? "visible" : "removed";
       // Apply to existing charts
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
-        chartComp.setVariableVisible(index, this.selectedVarsVisibility[index]);
+        chartComp.setVariableVisible(index, this.selectedVarsState[index] == "visible");
       }
     },
 
     onHoverOnVariable(index) {
       // Apply to existing charts
-      if (this.selectedVarsVisibility[index]) {
+      if (this.selectedVarsState[index] == "visible") {
         for (let i = 0; i < this.radars.length; i++) {
           let chartComp = this.$refs.chart[i];
           chartComp.highlightVariable(index);
@@ -167,8 +167,7 @@ export default {
       event.preventDefault();
       event.stopPropagation();
       // Remove data
-      this.selectedVars.splice(index, 1);
-      this.selectedVarsVisibility.splice(index, 1);
+      this.selectedVarsState[index] = "removed";
 
       // Apply to existing charts
       for (let i = 0; i < this.radars.length; i++) {

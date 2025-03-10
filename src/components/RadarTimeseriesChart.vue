@@ -247,26 +247,9 @@ export default {
     removeVariable(index) {
       // Reset highlights
       this.resetVariableHighlights();
-      this.chartOptions.series.splice(index, 1);
-      this.currentRadarVars.splice(index, 1);
-      this.$refs.chart.chart.series[index].remove()
-      this.$nextTick(() => {
-        //this.$refs.chart.chart.redraw();
-      })
-      return;
-
       // Hide variable
       this.setVariableVisible(index, false);
-      // Remove series
-      this.chartOptions.series[index].wasDeleted = true;
-      // Update graph
-      this.$nextTick(() => {
-        let tempRadarVar = this.currentRadarVars.filter((el, i) => i != index);
-        this.currentRadarVars = [];
-        for (let i = 0; i < tempRadarVar.length; i++) {
-          this.addRadarVar(tempRadarVar[i], tempRadarVar[i].selOption);
-        }
-      })
+
     },
 
 
