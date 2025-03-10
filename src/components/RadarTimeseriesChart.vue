@@ -116,7 +116,8 @@ export default {
               yAxis: [],
               plotOptions: {
                 column: {
-                  pointWidth: 5,
+                  pointWidth: 4,
+                  borderWidth: 0
                 }
               },
             }
@@ -128,7 +129,19 @@ export default {
   methods: {
 
     // PUBLIC
-    addRadarVar(radarVar, option) {
+    // When user adds a new variable while data is being loaded, the loading event should have preference over adding new vars.
+    // This function solves this.
+    async addRadarVar(radarVar, opt) {
+      // Wait of data promise to be resolved
+      await window.DataManager.getAntennaFiles(this.antennaID, this.reqTimestamps);
+      console.log("Antenna " + this.antennaID + " loaded")
+      await this.$nextTick(); // Prioritize
+
+      this.addRadarVarPrivate(radarVar, opt);
+    },
+
+    // INTERNAL
+    addRadarVarPrivate(radarVar, option) {
 
       // Store radarVar config in case we want to load more data later
       radarVar.selOption = option || radarVar.options[0];
@@ -239,7 +252,6 @@ export default {
       });
 
 
-      this.$refs.chart
     },
 
 
@@ -276,6 +288,12 @@ export default {
       }
       this.reqTimestamps = this.reqTimestamps.concat(timestamps);
 
+      // Change style for columns in there are many timestamps
+      if (this.reqTimestamps.length > 48) {
+        this.chartOptions.plotOptions.column.pointWidth = 5;
+        this.chartOptions.plotOptions.column.borderWidth = 0;
+      }
+
       // Call Datamanager tp get antenna data (DataManager > FileManager > DataManager HFRadar class > Return antenna)
       this.progress = 0;
       return window.DataManager.getAntennaFiles(this.antennaID, timestamps, (tmstsLoaded, totalTmstsToLoad) => {
@@ -300,7 +318,7 @@ export default {
           let tempRadarVar = this.currentRadarVars;
           this.currentRadarVars = [];
           for (let i = 0; i < tempRadarVar.length; i++) {
-            this.addRadarVar(tempRadarVar[i], tempRadarVar[i].selOption);
+            this.addRadarVarPrivate(tempRadarVar[i], tempRadarVar[i].selOption);
           }
         }
       }).catch(e => { throw e });
@@ -340,7 +358,7 @@ export default {
 
 <style scoped>
 #chart {
-  height: 200px;
+  height: 250px;
 }
 
 #progress-container {

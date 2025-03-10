@@ -131,10 +131,12 @@ export default {
       if (radarVarIndex != -1) {
         // Set state
         this.selectedVarsState[radarVarIndex] = 'visible';
-        // Show in chart
-        this.$refs.chart[radarVarIndex].setVariableVisible(radarVarIndex, true);
+        // Show in charts
+        for (let i = 0; i < this.radars.length; i++) {
+          this.$refs.chart[i].setVariableVisible(radarVarIndex, true);
+        }
+        
       } else {
-
         // Otherwise add radar variable
         let radarVar = new RadarVariableClass(radarVarIn);
         radarVar.selOption = opt;
@@ -330,7 +332,7 @@ table {
 
 .graph-container {
   width: 80%;
-  height: 200px;
+  height: 220px;
   background-color: var(--lightBlue);
   position: relative;
 }

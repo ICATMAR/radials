@@ -543,7 +543,8 @@ class DataManager {
       // Load the file in FileManager if not done
       promises.push(window.FileManager.loadAntennaFiles(antennaID, timestamps[i]).then((res) => {
         tmstsLoaded++;
-        progressCallback(tmstsLoaded, totalTmstsToLoad);
+        if (progressCallback)
+          progressCallback(tmstsLoaded, totalTmstsToLoad);
         if (res.length == 0) {
           debugger;
           return { status: "empty", timestamp: timestamps[i] };
