@@ -52,8 +52,8 @@
 
       <div class="selected-variable-container" v-show="!isVariablesTableVisible">
         <button v-for="(sRV, index) in selectedVars" @click="changeVarVisibility(index)"
-          :class="{'button-variable': selectedVarsState[index]=='visible', 'button-inactive': selectedVarsState[index]=='inactive', 'hidden': selectedVarsState[index]=='removed'}" class="clickable"
-          @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">
+          :class="{ 'button-variable': selectedVarsState[index] == 'visible', 'button-inactive': selectedVarsState[index] == 'inactive', 'hidden': selectedVarsState[index] == 'removed' }"
+          class="clickable" @mouseenter="onHoverOnVariable(index)" @mouseleave="onMouseLeaveVariable()">
           {{ sRV.name }} ({{ sRV.selOption }})
           <div class="highchartsLegendCircleColor" :style="{ background: highchartsColors[index] }"></div>
           <div class="remove-variable clickable" @click="removeVariable($event, index)">✕</div>
@@ -101,12 +101,15 @@ export default {
     for (let i = 0; i < 30; i++) {
       this.highchartsColors[i] = Highcharts.getOptions().colors[i];
     }
+    // Default selected option in variable
+    this.selectedVars[0].selOpt = this.selectedVars[0].options[0];
   },
   data() {
     return {
       radars: ["CREU", "BEGU", "AREN", "PBCN", "GNST"],
       radarFullNames: ["Cap de Creus", "Cap de Begur", "Port d'Arenys de Mar", "Port de Barcelona", "Port Ginesta"],
       radarVarsData: radarVarsDataFile,
+      // Default variable
       selectedVars: [radarVarsDataFile[0]],
       selectedVarsState: ["visible"], // visible, inactive, removed
       highchartsColors: [],
@@ -123,13 +126,24 @@ export default {
     },
 
     addRadarVar(radarVarIn, opt) {
-      let radarVar = new RadarVariableClass(radarVarIn);
-      radarVar.selOption = opt;
-      this.selectedVars.push(radarVar);
-      this.selectedVarsState.push("visible");
-      for (let i = 0; i < this.radars.length; i++) {
-        let chartComp = this.$refs.chart[i];
-        chartComp.addRadarVar(radarVar, opt);
+      // Check if radar variable exists and was hidden/removed
+      let radarVarIndex = this.selectedVars.findIndex(el => el.name == radarVarIn.name && el.selOption == opt);
+      if (radarVarIndex != -1) {
+        // Set state
+        this.selectedVarsState[radarVarIndex] = 'visible';
+        // Show in chart
+        this.$refs.chart[radarVarIndex].setVariableVisible(radarVarIndex, true);
+      } else {
+
+        // Otherwise add radar variable
+        let radarVar = new RadarVariableClass(radarVarIn);
+        radarVar.selOption = opt;
+        this.selectedVars.push(radarVar);
+        this.selectedVarsState.push("visible");
+        for (let i = 0; i < this.radars.length; i++) {
+          let chartComp = this.$refs.chart[i];
+          chartComp.addRadarVar(radarVar, opt);
+        }
       }
     },
 
