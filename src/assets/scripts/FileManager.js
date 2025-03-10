@@ -422,7 +422,7 @@ class FileManager {
     }
     let baseURL = origin + 'data/observational/hf_radar/currents/';
     let wavesBaseURL = origin + 'data/observational/hf_radar/waves/';
-
+console.log(baseURL);
     let date = timestamp == undefined ? new Date() : new Date(timestamp);
     let dateISO = date.toISOString();
     dateISO = dateISO.substring(0, 14) + '00:00.000Z'; // Hourly
