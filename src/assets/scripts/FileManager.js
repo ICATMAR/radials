@@ -417,7 +417,7 @@ class FileManager {
       origin = 'https://www.icatmar.cat/';
     }
     // github hosting
-    else if (window.location.origin.includes('icatmar.cat')){
+    else if (window.location.origin.includes('icatmar.github.io')){
       origin = 'https://icatmar.github.io/';
     }
     let baseURL = origin + 'data/observational/hf_radar/currents/';
