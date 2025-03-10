@@ -26,7 +26,8 @@ i18n.global.mergeLocaleMessage('es', es);
 
 // Declare event emitter
 // https://github.com/developit/mitt
-window.eventBus = window.mitt();
+import mitt from 'mitt'
+window.eventBus = mitt();
 
 // Utils for hash and routing
 import {setHashValue, getHashValue, removeHash} from './assets/scripts/utils.js';
