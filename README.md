@@ -9,3 +9,10 @@ npm create vite@6.1.1
 npm ci // if package-lock.json is present, otherwise "npm install"
 
 npm run dev
+
+## Deployment
+npm run build
+
+npm run preview
+
+https://vite.dev/guide/static-deploy.html#github-pages
