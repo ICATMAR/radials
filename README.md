@@ -15,4 +15,16 @@ npm run build
 
 npm run preview
 
+Follow instructions to create a custom deployment
 https://vite.dev/guide/static-deploy.html#github-pages
+Change in vite.config.js and add base, as in:
+```js
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [vue()],
+  base: '/radials/' // here add the name of the repository if <yourUserNameOrOrganization>.github.io/<yourRepository>
+})
+```
+
+Go to repository Settings > Pages > Build and Deployment, Source - select GitHubActions > Copy the code from the tutorial
+This will create a file (yml) inside the folder .github/workflows
