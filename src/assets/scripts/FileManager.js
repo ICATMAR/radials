@@ -406,9 +406,22 @@ class FileManager {
   // Get radar files
   loadAntennaFiles = function (antennaID, timestamp) {
 
-
-    let baseURL = 'http://127.0.0.1:5500/data/observational/hf_radar/currents/'
-    let wavesBaseURL = 'http://127.0.0.1:5500/data/observational/hf_radar/waves/'
+    // Resolve data paths
+    let origin;
+    // Local deployment with npm run dev and VS code live plugin at :5500
+    if (window.location.origin.includes('localhost')){
+      origin = 'http://127.0.0.1:5500/'
+    } 
+    // Icatmar hosting
+    else if (window.location.origin.includes('icatmar.cat')){
+      origin = 'https://www.icatmar.cat/';
+    }
+    // github hosting
+    else if (window.location.origin.includes('icatmar.cat')){
+      origin = 'https://icatmar.github.io/';
+    }
+    let baseURL = origin + 'data/observational/hf_radar/currents/';
+    let wavesBaseURL = origin + 'data/observational/hf_radar/waves/';
 
     let date = timestamp == undefined ? new Date() : new Date(timestamp);
     let dateISO = date.toISOString();
