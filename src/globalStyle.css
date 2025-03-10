@@ -130,6 +130,8 @@ button {
   justify-content: center;
 
   pointer-events: all;
+  cursor: pointer;
+  user-select: none;
 }
 
 button:hover {
@@ -151,13 +153,21 @@ button:hover {
   background-color: var(--red);
 }
 
+.button-inactive {
+  background-color: rgb(136 176 191);
+}
+
 @media screen and (max-width: 770px) {
   button {
     padding: 4px;
+    font-size: small;
   }
 }
 
 
+.hidden {
+  display: none;
+}
 
 
 
@@ -184,4 +194,18 @@ button:hover {
   .visibleInMobile {
     display: none;
   }
+}
+
+
+
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease, scale 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+  scale: 0.2;
 }
