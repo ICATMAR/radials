@@ -46,8 +46,8 @@ export default {
     for (let i = 0; i < this.radarVarsData.length; i++) {
       this.currentRadarVars.push(this.radarVarsData[i]);
     }
-    // Load 24 first hours
-    this.load24hMore();
+    // Load 24 first hours and store promise
+    this.load24hMorePromise = this.load24hMore();
   },
   data() {
     return {
@@ -132,9 +132,8 @@ export default {
     // When user adds a new variable while data is being loaded, the loading event should have preference over adding new vars.
     // This function solves this.
     async addRadarVar(radarVar, opt) {
-      // Wait of data promise to be resolved
-      await window.DataManager.getAntennaFiles(this.antennaID, this.reqTimestamps);
-      console.log("Antenna " + this.antennaID + " loaded")
+      // Wait of data promises to be resolved
+      await this.load24hMorePromise;
       await this.$nextTick(); // Prioritize
 
       this.addRadarVarPrivate(radarVar, opt);
