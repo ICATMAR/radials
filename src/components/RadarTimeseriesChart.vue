@@ -47,7 +47,7 @@ export default {
       this.currentRadarVars.push(this.radarVarsData[i]);
     }
     // Load 24 first hours and store promise
-    this.load24hMorePromise = this.load24hMore();
+    this.loadMoreHoursPromise = this.loadMoreHours(24);
   },
   data() {
     return {
@@ -133,7 +133,7 @@ export default {
     // This function solves this.
     async addRadarVar(radarVar, opt) {
       // Wait of data promises to be resolved
-      await this.load24hMorePromise;
+      await this.loadMoreHoursPromise;
       await this.$nextTick(); // Prioritize
 
       this.addRadarVarPrivate(radarVar, opt);
@@ -266,19 +266,20 @@ export default {
 
 
 
-    // Load 24 files more
-    load24hMore() {
+    // Load x files more
+    loadMoreHours(reqHours) {
+      let hours = reqHours || 24;
 
       this.showNoData = false;
 
       let timestamps = [];
-      // 24 back in time
+      // Hours back in time
       let date = new Date();
       let dateISO = date.toISOString();
       date.setUTCHours(date.getUTCHours() - this.currentHoursBackInTime); // One hour less
-      this.currentHoursBackInTime += 24;
+      this.currentHoursBackInTime += hours;
       // Back in time
-      for (let i = 0; i < 24; i++) {
+      for (let i = 0; i < hours; i++) {
         if (i > 0)
           date.setUTCHours(date.getUTCHours() - 1); // One hour less
         dateISO = date.toISOString();

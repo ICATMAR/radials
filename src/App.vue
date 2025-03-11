@@ -45,9 +45,9 @@
 
       <!-- More variables button and load 24h more -->
       <div class="options-container" v-show="!isVariablesTableVisible">
-        <button @click="loadPrevious24h">
-          << {{ $t('Load 24h more') }}</button>
-            <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
+        <button @click="loadPrevious72h"> << {{ $t('Load 3 days more') }}</button>
+        <button @click="loadPrevious24h"> << {{ $t('Load 24 hours more') }}</button>
+        <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
       </div>
 
       <div class="selected-variable-container" v-show="!isVariablesTableVisible">
@@ -121,7 +121,14 @@ export default {
     loadPrevious24h() {
       for (let i = 0; i < this.radars.length; i++) {
         let chartComp = this.$refs.chart[i];
-        chartComp.load24hMore();
+        chartComp.loadMoreHours(24);
+      }
+    },
+
+    loadPrevious72h() {
+      for (let i = 0; i < this.radars.length; i++) {
+        let chartComp = this.$refs.chart[i];
+        chartComp.loadMoreHours(24 * 3);
       }
     },
 
