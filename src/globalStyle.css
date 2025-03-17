@@ -56,6 +56,27 @@ body {
 
 
 
+.logo {
+  position: fixed;
+  top: 25px;
+  padding: 0px;
+  margin: 0px;
+  z-index: 10;
+}
+
+.logo-big {
+  width: 50px;
+  height: 50px;
+}
+
+.icatmar-logo {
+  left: 25px;
+  box-shadow: 0 0 4px black;
+  border-radius: 50%;
+}
+
+
+
 
 
 .icon-str {
@@ -161,6 +182,15 @@ button:hover {
   button {
     padding: 4px;
     font-size: small;
+  }
+
+  .logo-big {
+    width: 35px;
+    height: 35px;
+  }
+
+  .icatmar-logo {
+    left: 10px;
   }
 }
 

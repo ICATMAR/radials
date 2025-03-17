@@ -73,26 +73,6 @@ const changeActiveSync = function (e) {
 
 
 <style scoped>
-.logo {
-  position: fixed;
-  top: 10px;
-  padding: 0px;
-  margin: 0px;
-  z-index: 10;
-}
-
-.logo-big {
-  width: 50px;
-  height: 50px;
-}
-
-.icatmar-logo {
-  left: 50px;
-  box-shadow: 0 0 4px black;
-  border-radius: 50%;
-}
-
-
 
 
 
@@ -141,15 +121,4 @@ const changeActiveSync = function (e) {
   text-align: center;
 }
 
-
-@media screen and (max-width: 770px) {
-  .logo-big {
-    width: 35px;
-    height: 35px;
-  }
-
-  .icatmar-logo {
-    left: 30px;
-  }
-}
 </style>

@@ -1,7 +1,11 @@
 <template>
   <TopIcons></TopIcons>
   <!-- Page container -->
-  <div class="main-container">
+  <div class="main-container" ref="mainContainer">
+
+    <!-- ICATMAR ICON for REPORT -->
+    <img class="logo logo-big clickable icatmar-logo" src="/src/assets/img/logos/icatmar-mini-logo.svg">
+
 
 
     <!-- RADIALS TITLE -->
@@ -40,14 +44,16 @@
     <!-- MAIN CONTENT WITH CHARTS -->
 
     <!-- VARIABLES AND OPTIONS -->
-    <div class="variables-options-container">
+    <div class="variables-options-container" v-show="!isPrintingReport">
 
 
       <!-- More variables button and load 24h more -->
       <div class="options-container" v-show="!isVariablesTableVisible">
-        <button @click="loadPrevious72h"> << {{ $t('Load 3 days more') }}</button>
-        <button @click="loadPrevious24h"> << {{ $t('Load 24 hours more') }}</button>
-        <button @click="isVariablesTableVisible = true">+ {{ $t('Add other variables') }}</button>
+        <button @click="loadPrevious72h">
+          << {{ $t('Load 3 days more') }}</button>
+        <button @click="loadPrevious24h">
+          << {{ $t('Load 24 hours more') }}</button>
+        <button @click="isVariablesTableVisible = true">+ {{ $t('Add more variables') }}</button>
       </div>
 
       <div class="selected-variable-container" v-show="!isVariablesTableVisible">
@@ -60,6 +66,9 @@
         </button>
       </div>
     </div>
+
+    <!-- DOWNLOAD BUTTON -->
+    <button @click="downloadReport" v-show="!isPrintingReport">Download report</button>
 
     <!-- CHARTS -->
     <!-- Chart - Data visualization  -->
@@ -95,6 +104,8 @@ import RadarVariableClass from "./components/RadarVariableClass.js";
 
 // Graph colors
 import Highcharts from 'highcharts';
+// Export
+import html2canvas from 'html2canvas';
 
 export default {
   mounted() {
@@ -114,6 +125,7 @@ export default {
       selectedVarsState: ["visible"], // visible, inactive, removed
       highchartsColors: [],
       isVariablesTableVisible: false,
+      isPrintingReport: false,
     }
 
   },
@@ -142,7 +154,7 @@ export default {
         for (let i = 0; i < this.radars.length; i++) {
           this.$refs.chart[i].setVariableVisible(radarVarIndex, true);
         }
-        
+
       } else {
         // Otherwise add radar variable
         let radarVar = new RadarVariableClass(radarVarIn);
@@ -197,6 +209,34 @@ export default {
         let chartComp = this.$refs.chart[i];
         chartComp.removeVariable(index);
       }
+    },
+
+
+    // Download report
+    downloadReport() {
+      // Allow scrollable section to be visible
+      this.isPrintingReport = true;
+      this.$refs.mainContainer.style.position = 'relative';
+
+      // HTML2Canvas
+      this.$nextTick(() => {
+        html2canvas(this.$refs.mainContainer, {
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: document.documentElement.scrollWidth,
+          windowHeight: document.documentElement.scrollHeight,
+          useCORS: true, // Helps with external images
+        }).then(canvas => {
+          // Download
+          let link = document.createElement('a');
+          link.download = 'HFAntennasReport.png';
+          link.href = canvas.toDataURL();
+          link.click();
+          // Reset style
+          this.$refs.mainContainer.style.position = 'fixed';
+          this.isPrintingReport = false;
+        });
+      });
     }
   },
   components: {
