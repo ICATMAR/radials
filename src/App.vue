@@ -51,9 +51,9 @@
       <div class="options-container" v-show="!isVariablesTableVisible">
         <button @click="loadPrevious72h">
           << {{ $t('Load 3 days more') }}</button>
-        <button @click="loadPrevious24h">
-          << {{ $t('Load 24 hours more') }}</button>
-        <button @click="isVariablesTableVisible = true">+ {{ $t('Add more variables') }}</button>
+            <button @click="loadPrevious24h">
+              << {{ $t('Load 24 hours more') }}</button>
+                <button @click="isVariablesTableVisible = true">+ {{ $t('Add more variables') }}</button>
       </div>
 
       <div class="selected-variable-container" v-show="!isVariablesTableVisible">
@@ -67,8 +67,7 @@
       </div>
     </div>
 
-    <!-- DOWNLOAD BUTTON -->
-    <button @click="downloadReport" v-show="!isPrintingReport">Download report</button>
+
 
     <!-- CHARTS -->
     <!-- Chart - Data visualization  -->
@@ -84,9 +83,13 @@
     </div>
 
 
+
+
     <!-- BOTTOM -->
     <!-- Bottom images of radars -->
     <div class="imgs-radars-container">
+      <!-- DOWNLOAD BUTTON -->
+      <button class="download-report" @click="downloadReport" v-show="!isPrintingReport">Download report</button>
       <!-- <div v-for="rr in radars" class="img-radar-container">
           <div class="img-radar-title ">{{ rr }}</div>
           <div class="filler-img"></div>
@@ -399,6 +402,18 @@ table {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
+  justify-content: flex-end;
+  overflow-y: hidden
+}
+
+.download-report {
+  background: var(--blue);
+  margin: 10px;
+  border-radius: 0px;
+}
+
+.download-report:hover {
+  background: var(--lightBlue);
 }
 
 
@@ -459,6 +474,10 @@ table {
 
   .selected-variable-container {
     padding: 0px;
+  }
+
+  .imgs-radars-container {
+    justify-content: center;
   }
 }
 </style>
